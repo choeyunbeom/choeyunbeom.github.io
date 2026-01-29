@@ -258,14 +258,14 @@ After solving Problems #1 and #2, we achieved sporadic completions, but the poli
 
 ```
 Success Rate Breakdown (4,349 episodes):
-├─ Reach >3000m: 3.38% (147 episodes)
-├─ Reach >3500m: 1.23% (53 episodes)  
-└─ Complete lap:  0.85% (37 episodes)
+├─ Reach 3000-3600m: 2.53% (110 episodes)
+├─ Complete lap (≥3600m): 0.85% (37 episodes)
+└─ Total >3000m: 3.38% (147 episodes)
 
 Difficulty scaling:
-- Reaching 3000m baseline difficulty: 1.0x
-- Reaching 3500m: 2.7x harder (3.38% → 1.23%)
-- Completing lap: 4.0x harder (3.38% → 0.85%)
+- Episodes reaching 3000m: 147 (3.38%)
+- Of those, completing lap: 37 (25.2%)
+- Final 600m success rate: 1 in 4 attempts
 
 Interpretation: The final 600m exhibits exponentially 
 increasing difficulty, not linear progression.
@@ -894,24 +894,31 @@ The journey from "crashing at 2400m" to "completing 3600m" taught us that **RL d
 
 ```
 torcs-rl-project/
-├── agents/
-│   ├── sac_agent.py          # SAC implementation
-│   ├── ppo_agent.py          # PPO implementation
-│   └── reward_functions.py   # All reward function versions
-├── environments/
-│   └── torcs_env.py          # TORCS environment wrapper
-├── training/
-│   ├── train_sac.py          # SAC training script
-│   ├── train_ppo.py          # PPO training script
-│   └── logger.py             # Training logger
-├── analysis/
-│   ├── analyze_logs.py       # Data analysis scripts
-│   └── generate_plots.py     # Visualization scripts
-├── checkpoints/
-│   ├── sac_995k_steps.zip    # Pre-catastrophic checkpoint
-│   └── sac_3247k_steps.zip   # Post-breakthrough checkpoint
-└── logs/
-    └── training_log.csv      # 4,349 episode records
+├── README.md                    # This file
+├── blog_post.md                 # Full technical write-up
+│
+├── docs/                        # Detailed documentation
+│   ├── progress_report.md       # SAC training chronicle
+│   ├── progress_report_ppo.md   # PPO training attempts
+│   ├── troubleshooting_report.md  # Debugging log
+│   ├── sac_analysis.pdf # Interactive analysis
+│   └── ppo_analysis.pdf        # PPO failure analysis
+│
+├── sac_clean_resume.py
+├── sac_hybrid_10k.py
+├── gym_torcs.py
+├── snakeoil3_gym.py
+├── autostart.sh
+├── practice.xml
+├── requirements.txt
+├── example_experiment.py
+├── vtorcs-RL-color/
+│
+│
+└── assets/                      # Visualizations
+    ├── sac_cumulative_progress.png
+    ├── sac_distance_distribution.png
+    └── sac_success_rate.png
 ```
 
 ### B. Hyperparameters
@@ -956,16 +963,9 @@ ppo_params = {
 ### C. Computational Resources
 
 ```
-Hardware:
-- CPU: [Your CPU]
-- GPU: [Your GPU]
-- RAM: [Your RAM]
-
 Training Time:
 - SAC: ~36 hours (9.7M steps)
 - PPO: ~48 hours (8M steps, incomplete)
-
-Total Cost: [If using cloud compute]
 ```
 
 ### D. References
@@ -983,6 +983,9 @@ Total Cost: [If using cloud compute]
 
 ---
 
-**Contact**: sgychoe@liverpool.ac.uk
+**Contact**: 
+- sgychoe@liverpool.ac.uk
+- z.wang252@liverpool.ac.uk
+- v.saravanan@liverpool.ac.uk
 **Project Repository**: [https://github.com/choeyunbeom/ibm_ai_race]  
 **Date**: January 28, 2026
