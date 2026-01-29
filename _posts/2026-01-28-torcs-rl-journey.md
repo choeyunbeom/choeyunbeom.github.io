@@ -340,7 +340,6 @@ While we demonstrated **capability** (37 completions prove the approach works), 
 3. **Reward Redesign**: Replace distance-based rewards with trajectory-following rewards
 4. **Model Architecture**: Try recurrent policies (LSTM/GRU) for temporal reasoning
 
-_[Graph 4: Success Rate Over Training - rolling 100-episode window]_
 
 ---
 
@@ -494,8 +493,6 @@ Both algorithms struggled with the speed-safety trade-off, but in different ways
 - Longer training horizons with stable rewards
 - Tasks where catastrophic forgetting is unacceptable
 - Scenarios requiring guaranteed monotonic improvement
-
-_[Graph 5: SAC vs PPO Learning Curves Comparison]_
 
 ---
 
