@@ -985,5 +985,6 @@ Training Time:
     - Zhiheng Wang, z.wang252@liverpool.ac.uk
     - Vishal Saravanan, v.saravanan@liverpool.ac.uk
     - Saif ur Rehman, sgsrehm1@liverpool.ac.uk
+    - Katalin Pazmany, sgkpazmany@liverpool.ac.uk
 - **Project Repository**: [(https://github.com/choeyunbeom/ibm_ai_race)](https://github.com/choeyunbeom/ibm_ai_race)  
 - **Date**: January 28, 2026
