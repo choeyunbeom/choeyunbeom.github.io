@@ -8,8 +8,13 @@ author: Choeyunbeom
 
 # TORCS Corkscrew Challenge: A Journey Through Reinforcement Learning Failures and Breakthroughs
 
-{% youtube QaKw87aEHFM %}
-{% youtube BINCxvbfTgk %}
+<div align="center">
+  <h3>Racing Video</h3>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/QaKw87aEHFM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  
+  <h3>Team Presentation</h3>
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/BINCxvbfTgk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
 
 ## Abstract
 
