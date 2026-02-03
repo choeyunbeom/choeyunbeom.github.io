@@ -8,6 +8,9 @@ author: Choeyunbeom
 
 # TORCS Corkscrew Challenge: A Journey Through Reinforcement Learning Failures and Breakthroughs
 
+{% youtube QaKw87aEHFM %}
+{% youtube BINCxvbfTgk %}
+
 ## Abstract
 
 This report documents the development of an autonomous racing agent for the TORCS Corkscrew track using Soft Actor-Critic (SAC) and Proximal Policy Optimization (PPO). Rather than presenting a polished final result, this post focuses on the **problem-solving journey**: identifying failure modes, forming data-driven hypotheses, and implementing iterative solutions. Over 9.7M training steps across 4,349 episodes, we achieved 37 track completions (0.85%), with key insights into reward engineering, hyperparameter sensitivity, and algorithm trade-offs.
