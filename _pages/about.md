@@ -2,7 +2,27 @@
 permalink: /about/
 title: "About"
 ---
+## Hi, I'm Yunbeom Choe
 
-Tempor velit sint sunt ipsum tempor enim ad qui ullamco. Est dolore anim ad velit duis dolore minim sunt aliquip amet commodo labore. Ut eu pariatur aute ea aute excepteur laborum. Esse ea esse excepteur minim mollit qui cillum excepteur ex dolore magna. Labore deserunt fugiat incididunt incididunt sint ea. Consequat dolore aute laboris quis proident quis non et est consectetur ex eiusmod sit culpa.
+I'm an MSc student in Data Science and Artificial Intelligence at the University of Liverpool. I transitioned from Naval Architecture and Ocean Engineering (Chonnam National University) to pursue my passion for machine learning and AI.
 
-Cupidatat ea do et in excepteur in. Ad nostrud ut est esse eu duis ea sunt eiusmod. Aliquip tempor veniam sint elit fugiat. Velit incididunt laboris amet incididunt labore dolore irure velit excepteur commodo deserunt laborum. Consectetur eu fugiat veniam veniam Lorem labore magna eiusmod. Ea occaecat reprehenderit pariatur consectetur minim labore ut aliquip.
+## What I Work On
+
+My primary focus is on **generative AI** and **deep learning**. I have hands-on experience with:
+
+- **Model Fine-tuning**: Stable Diffusion and Llama 3 using LoRA/QLoRA techniques
+- **Model Deployment**: Building and serving ML models with FastAPI
+- **Reinforcement Learning**: Autonomous racing agents using PPO and SAC in TORCS simulation
+- **Computer Vision**: Diffusion-based image generation (DALL·E 2, Stable Diffusion, Imagen)
+
+## Certifications
+
+- Microsoft Azure AI Fundamentals (AI-900)
+
+## About This Blog
+
+This blog is a space where I document my learning journey in ML/AI — covering model architectures, implementation details, project walkthroughs, and lessons learned from research and coursework.
+
+## Contact
+
+Feel free to connect with me through the links on this page, or reach out if you'd like to discuss anything ML/AI related.
