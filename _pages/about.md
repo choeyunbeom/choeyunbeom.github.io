@@ -13,7 +13,6 @@ My primary focus is on **generative AI** and **deep learning**. I have hands-on 
 - **Model Fine-tuning**: Stable Diffusion and Llama 3 using LoRA/QLoRA techniques
 - **Model Deployment**: Building and serving ML models with FastAPI
 - **Reinforcement Learning**: Autonomous racing agents using PPO and SAC in TORCS simulation
-- **Computer Vision**: Diffusion-based image generation (DALL·E 2, Stable Diffusion, Imagen)
 
 ## Certifications
 
