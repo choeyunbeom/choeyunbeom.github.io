@@ -22,9 +22,9 @@ toc_icon: "cog"
 
 > Ask a natural language question → the system retrieves relevant arXiv papers → generates a cited, grounded answer using a local LLM.
 
-![Query → answer flow with source citations and latency breakdown](/assets/images/ui_demo.gif)
-![Streamlit UI — interactive Q&A interface with source cards and latency breakdown](/assets/images/main_demo.png)
-![FastAPI Swagger UI — interactive API documentation with example requests and responses](/assets/images/swagger_demo.png)
+![Query → answer flow with source citations and latency breakdown](assets/images/ui_demo.gif)
+![Streamlit UI — interactive Q&A interface with source cards and latency breakdown](assets/images/main_demo.png)
+![FastAPI Swagger UI — interactive API documentation with example requests and responses](assets/images/swagger_demo.png)
 
 ## Abstract
 
@@ -633,7 +633,7 @@ More importantly, the debugging methodology is transferable:
 **Source Code**: [github.com/choeyunbeom/arxiv_rag_system](https://github.com/choeyunbeom/arxiv_rag_system)
 
 **Detailed Logs**:
-- [Embedding Model Debugging](docs/embedding_model_debugging.md)
-- [Retrieval Optimisation Experiments](docs/retrieval_optimisation.md)
-- [Fine-Tuning Experiment Log](docs/finetuning_experiment.md)
-- [Development Log](docs/Development_log.md)
+- [Embedding Model Debugging](https://github.com/choeyunbeom/arxiv_rag_system/blob/main/docs/embedding_model_debugging.md)
+- [Retrieval Optimisation Experiments](https://github.com/choeyunbeom/arxiv_rag_system/blob/main/docs/retrieval_optimisation.md)
+- [Fine-Tuning Experiment Log](https://github.com/choeyunbeom/arxiv_rag_system/blob/main/docs/finetuning_experiment.md)
+- [Development Log](https://github.com/choeyunbeom/arxiv_rag_system/blob/main/docs/Development_log.md)
