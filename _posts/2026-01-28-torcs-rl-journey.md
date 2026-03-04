@@ -4,6 +4,10 @@ date: 2026-01-28
 categories: [Reinforcement Learning, Autonomous Driving]
 tags: [TORCS, SAC, PPO, Deep RL, Problem Solving]
 author: Choeyunbeom
+toc: true
+toc_label: "Table of Contents"
+toc_icon: "cog"
+toc_sticky: true
 ---
 
 # TORCS Corkscrew Challenge: A Journey Through Reinforcement Learning Failures and Breakthroughs

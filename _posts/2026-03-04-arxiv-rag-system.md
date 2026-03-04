@@ -14,6 +14,7 @@ tags:
 toc: true
 toc_label: "Table of Contents"
 toc_icon: "cog"
+toc_sticky: true
 ---
 
 # arXiv RAG System: Engineering an Academic Paper Q&A System from Scratch
