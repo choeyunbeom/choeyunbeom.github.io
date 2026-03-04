@@ -22,9 +22,9 @@ toc_icon: "cog"
 
 > Ask a natural language question → the system retrieves relevant arXiv papers → generates a cited, grounded answer using a local LLM.
 
-![Query → answer flow with source citations and latency breakdown](assets/images/ui_demo.gif)
-![Streamlit UI — interactive Q&A interface with source cards and latency breakdown](assets/images/main_demo.png)
-![FastAPI Swagger UI — interactive API documentation with example requests and responses](assets/images/swagger_demo.png)
+![Query → answer flow with source citations and latency breakdown](/assets/images/ui_demo.gif)
+![Streamlit UI — interactive Q&A interface with source cards and latency breakdown](/assets/images/main_demo.png)
+![FastAPI Swagger UI — interactive API documentation with example requests and responses](/assets/images/swagger_demo.png)
 
 ## Abstract
 
