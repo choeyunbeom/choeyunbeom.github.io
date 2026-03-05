@@ -273,13 +273,20 @@ ChromaDB doesn't support BM25 natively. Solution: a parallel pipeline using `ran
 
 ```python
 # RRF fusion
-def reciprocal_rank_fusion(vector_results, bm25_results, k=60):
-    scores = {}
-    for rank, doc in enumerate(vector_results):
-        scores[doc.id] = scores.get(doc.id, 0) + 1 / (k + rank + 1)
-    for rank, doc in enumerate(bm25_results):
-        scores[doc.id] = scores.get(doc.id, 0) + 1 / (k + rank + 1)
-    return sorted(scores.items(), key=lambda x: x[1], reverse=True)
+def _rrf_fusion(self, vector_ranks: dict, bm25_ranks: dict, k: int = 60) -> list[str]:
+        """Reciprocal Rank Fusion to combine two ranked lists."""
+        all_ids = set(vector_ranks.keys()) | set(bm25_ranks.keys())
+
+        scores = {}
+        for cid in all_ids:
+            score = 0.0
+            if cid in vector_ranks:
+                score += 1.0 / (k + vector_ranks[cid])
+            if cid in bm25_ranks:
+                score += 1.0 / (k + bm25_ranks[cid])
+            scores[cid] = score
+
+        return sorted(scores.keys(), key=lambda x: scores[x], reverse=True)
 ```
 
 **Results:**
