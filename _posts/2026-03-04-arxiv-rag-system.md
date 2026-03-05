@@ -26,6 +26,9 @@ toc_sticky: true
 ![Query → answer flow with source citations and latency breakdown](/assets/images/ui_demo.gif)
 ![Streamlit UI — interactive Q&A interface with source cards and latency breakdown](/assets/images/main_demo.png)
 ![FastAPI Swagger UI — interactive API documentation with example requests and responses](/assets/images/swagger_demo.png)
+![Interactive 3D UMAP Visualisation of Embedding Space](docs/demo/umap_demo.png)
+
+> The UI shows the full query flow: enter a question → hybrid retrieval searches 132 arXiv papers → cross-encoder reranks results → Qwen3 4B generates a cited answer. 3D UMAP visualisations map the query to the semantic space of the arXiv corpus. Latency breakdown shows retrieval vs generation time.
 
 ## Abstract
 
