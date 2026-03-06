@@ -28,11 +28,11 @@ toc_sticky: true
 ![FastAPI Swagger UI — interactive API documentation with example requests and responses](/assets/images/swagger_demo.png)
 ![Interactive 3D UMAP Visualisation of Embedding Space](/assets/images/umap_demo.png)
 
-> The UI shows the full query flow: enter a question → hybrid retrieval searches 132 arXiv papers → cross-encoder reranks results → Qwen3 4B generates a cited answer. 3D UMAP visualisations map the query to the semantic space of the arXiv corpus. Latency breakdown shows retrieval vs generation time.
+> The UI shows the full query flow: enter a question → hybrid retrieval searches 153 arXiv papers → cross-encoder reranks results → Qwen3 4B generates a cited answer. 3D UMAP visualisations map the query to the semantic space of the arXiv corpus. Latency breakdown shows retrieval vs generation time.
 
 ## Abstract
 
-This post documents the 7-day build of an end-to-end Retrieval-Augmented Generation system for querying 132 academic papers from arXiv. Rather than presenting a polished final result, this focuses on the **engineering journey**: a broken embedding pipeline on Day 1, a systematic retrieval optimisation that hit 100% hit rate, and a fine-tuning experiment that regressed by 28 percentage points due to training data contamination.
+This post documents the 7-day build of an end-to-end Retrieval-Augmented Generation system for querying 153 academic papers from arXiv. Rather than presenting a polished final result, this focuses on the **engineering journey**: a broken embedding pipeline on Day 1, a systematic retrieval optimisation that hit 100% hit rate, and a fine-tuning experiment that regressed by 28 percentage points due to training data contamination.
 
 **Key Contributions:**
 
@@ -47,7 +47,7 @@ This post documents the 7-day build of an end-to-end Retrieval-Augmented Generat
 
 ### 1.1 The Goal
 
-Build a system that can answer questions about recent ML research by grounding answers in actual arXiv papers. The user asks a natural language question; the system retrieves the most relevant chunks from a 132-paper corpus and generates a cited prose answer.
+Build a system that can answer questions about recent ML research by grounding answers in actual arXiv papers. The user asks a natural language question; the system retrieves the most relevant chunks from a 153-paper corpus and generates a cited prose answer.
 
 **Constraints:**
 - Fully local: all inference runs on Apple M4 Pro via Ollama, no API calls
@@ -100,7 +100,7 @@ FastAPI Backend (POST /query)
 ### 2.2 Final Statistics
 
 ```
-Corpus:            132 arXiv papers (RAG, LoRA, hallucination, etc.)
+Corpus:            153 arXiv papers (RAG, LoRA, hallucination, etc.)
 Indexed Chunks:    2,885 (450-token BPE chunks)
 Embedding Model:   mxbai-embed-large (335M params)
 LLM:               Qwen3 4B (Q4_K_M via Ollama)
@@ -132,7 +132,7 @@ Tests:             104 (85 unit + 19 integration)
 
 ### 3.1 Problem Discovery
 
-After indexing ~4,000 chunks from 132 papers into ChromaDB, I ran a simple test query:
+After indexing ~4,000 chunks from 153 papers into ChromaDB, I ran a simple test query:
 
 ```
 Query: "What is Retrieval Augmented Generation?"
@@ -364,7 +364,7 @@ The reduction in total chunks (5,110 → 2,885) is expected — 450 tokens ≈ 3
 2. Output clean prose — no markdown headers or bullet points
 3. Refuse politely when context is insufficient
 
-**Training data**: 1,997 synthetic Q&A pairs generated from the 132-paper corpus using Qwen3 4B itself via Ollama's `format: json` parameter.
+**Training data**: 1,997 synthetic Q&A pairs generated from the 153-paper corpus using Qwen3 4B itself via Ollama's `format: json` parameter.
 
 | Type | Count | Purpose |
 |------|-------|---------|
@@ -548,7 +548,7 @@ Generation:                ~15-20s
 
 | Day | Focus | Key Outcomes |
 |-----|-------|-------------|
-| 1 | Infrastructure | 132 papers crawled, parsed, chunked, indexed. Caught embedding model failure via cosine similarity test. |
+| 1 | Infrastructure | 153 papers crawled, parsed, chunked, indexed. Caught embedding model failure via cosine similarity test. |
 | 2 | RAG Pipeline | FastAPI + Streamlit serving. Evaluation pipeline with 15-question benchmark. Qwen3 thinking mode fix. |
 | 3 | Retrieval Optimisation | Hit Rate 60% → 100%, MRR 0.51 → 0.82. Hybrid search + cross-encoder reranking. |
 | 4 | Fine-Tuning Prep | 1,997 synthetic Q&A pairs generated. Code quality refactoring. |
@@ -605,7 +605,7 @@ A model can retain semantic understanding while failing on keyword coverage (or 
 
 ### Current Limitations
 
-- **In-memory BM25**: All chunks loaded into memory. Sufficient for 132 papers (~3K chunks). For larger corpora, would need ElasticSearch/OpenSearch.
+- **In-memory BM25**: All chunks loaded into memory. Sufficient for 153 papers (~3K chunks). For larger corpora, would need ElasticSearch/OpenSearch.
 - **Synchronous Ollama calls**: Adequate for single-user demo. Multi-user serving would need `httpx.AsyncClient`.
 - **Ollama not containerised**: Runs on host for Apple Silicon Metal GPU access. Cloud deployment would need a GPU-enabled container or API-based LLM.
 - **Evaluation dataset**: 15 Q&A pairs is sufficient for directional comparison but not for statistical significance claims.
@@ -614,7 +614,7 @@ A model can retain semantic understanding while failing on keyword coverage (or 
 
 1. **Domain-specific reranker**: `ms-marco-MiniLM-L-6-v2` is trained on web search data. A SciBERT-based or BGE-Reranker may perform better on academic text with mathematical notation.
 2. **Fine-tuning (revisited)**: Re-run with contamination-free training data generated by a separate model, with automated instruction leakage checks.
-3. **Larger corpus**: The 132-paper corpus was chosen for tractability. Scaling to 1,000+ papers would test the in-memory BM25 limitation.
+3. **Larger corpus**: The 153-paper corpus was chosen for tractability. Scaling to 1,000+ papers would test the in-memory BM25 limitation.
 4. **Streaming**: The 15–20s generation latency is visible to users. Adding streaming to the Streamlit UI would improve perceived performance without changing actual latency.
 
 ---
