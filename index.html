@@ -1,7 +1,23 @@
 ---
-# You don't need to edit this file, it's empty on purpose.
-# Edit theme's home layout instead if you wanna make some changes
-# See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 layout: home
 author_profile: true
+header:
+  overlay_color: "#1a1a2e"
+  excerpt: "ML Engineer & Data Scientist in training. Building things, breaking them, writing about it."
+
+feature_row:
+  - title: "TORCS RL Racing Agent"
+    excerpt: "9.7M steps of reinforcement learning in TORCS simulator. PPO, reward shaping, catastrophic forgetting — the full journey."
+    url: "/reinforcement%20learning/autonomous%20driving/torcs-rl-journey/"
+    btn_label: "Read Post"
+    btn_class: "btn--primary"
+  - title: "arXiv RAG System"
+    excerpt: "End-to-end academic paper Q&A system built from scratch. FastAPI + FAISS + LLM, fully containerized with Docker."
+    url: "/machine%20learning/nlp/arxiv-rag-system/"
+    btn_label: "Read Post"
+    btn_class: "btn--primary"
 ---
+
+## Featured Projects
+
+{% include feature_row %}

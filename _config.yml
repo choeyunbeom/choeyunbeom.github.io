@@ -14,7 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: "Choeyunbeom's Tech Blog"
-email: sgychoe@liverpool.ac.uk
+email: yunbeom.choe.dev@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   "ML/AI Engineering Journey"
 github_username: choeyunbeom
@@ -55,9 +55,11 @@ plugins:
   - jekyll-include-cache
 
 author:
-  name   : "Yunbeom Choe"
-  avatar : "/assets/images/bio-photo.jpg"
-  bio    : "MSc Data Science & AI @ University of Liverpool"
+  name: "Yunbeom Choe"
+  avatar: "/assets/images/bio-photo.jpg"
+  bio: "MSc Data Science & AI @ University of Liverpool. Interested in Generative AI, MLOps, and Reinforcement Learning."
+  location: "Liverpool, UK"
+  email: "yunbeom.choe.dev@gmail.com"
   links:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
@@ -65,6 +67,9 @@ author:
     - label: "LinkedIn"
       icon: "fab fa-fw fa-linkedin"
       url: "https://www.linkedin.com/in/yunbeom-choe-52a348370"
+    - label: "Email"
+      icon: "fas fa-fw fa-envelope"
+      url: "mailto:yunbeom.choe.dev@gmail.com"
 
 
 footer:
