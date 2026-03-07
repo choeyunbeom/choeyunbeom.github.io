@@ -16,7 +16,7 @@ MSc Data Science & AI student at the University of Liverpool. I build end-to-end
 
 End-to-end Retrieval-Augmented Generation system for querying academic papers from arXiv.
 
-- **Stack**: FastAPI, ChromaDB, FAISS, Qwen3 4B (via Ollama), Streamlit, Docker
+- **Stack**: FastAPI, ChromaDB, Qwen3 4B (via Ollama), Streamlit, Docker
 - **7-day build**: broken embedding pipeline on Day 1, systematic retrieval optimisation that hit 100% hit rate by Day 5
 - Hybrid retrieval (dense + sparse) + cross-encoder reranking over 153 arXiv papers
 - LoRA fine-tuning experiment — documented a 28pp regression caused by training data contamination
@@ -31,7 +31,7 @@ End-to-end Retrieval-Augmented Generation system for querying academic papers fr
 
 Autonomous racing agent trained on the TORCS Corkscrew track using deep reinforcement learning.
 
-- **Stack**: Python, PyTorch, SAC, PPO
+- **Stack**: Python, Stable-Baselines3, SAC, PPO
 - 9.7M training steps across 4,349 episodes — 37 track completions (0.85%)
 - Systematic failure mode analysis: 52.59% early crashes, 32.33% S-curve failures
 - Reward shaping, hyperparameter sensitivity analysis, and catastrophic forgetting investigation
@@ -44,7 +44,7 @@ Autonomous racing agent trained on the TORCS Corkscrew track using deep reinforc
 
 **Languages**: Python, SQL  
 **ML/AI**: PyTorch, Hugging Face, LangChain, RAG, RL (SAC, PPO), LoRA fine-tuning  
-**MLOps**: FastAPI, Docker, FAISS, ChromaDB, pytest  
+**MLOps**: FastAPI, Docker, ChromaDB, pytest
 **Tools**: Git, Ollama, Streamlit
 
 ---
