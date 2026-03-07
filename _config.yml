@@ -59,7 +59,6 @@ author:
   avatar: "/assets/images/bio-photo.jpg"
   bio: "MSc Data Science & AI @ University of Liverpool. Interested in Generative AI, MLOps, and Reinforcement Learning."
   location: "Liverpool, UK"
-  email: "yunbeom.choe.dev@gmail.com"
   links:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
