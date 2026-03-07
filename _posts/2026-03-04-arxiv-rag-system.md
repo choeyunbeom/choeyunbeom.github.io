@@ -30,6 +30,8 @@ toc_sticky: true
 
 > The UI shows the full query flow: enter a question → hybrid retrieval searches 153 arXiv papers → cross-encoder reranks results → Qwen3 4B generates a cited answer. 3D UMAP visualisations map the query to the semantic space of the arXiv corpus. Latency breakdown shows retrieval vs generation time.
 
+**TL;DR**: Built an end-to-end RAG system for 153 arXiv papers in 7 days. Retrieval went from 60% to 100% hit rate through hybrid search and cross-encoder reranking. LoRA fine-tuning regressed by 28pp due to training data contamination — few-shot prompting won instead.
+
 ## Abstract
 
 This post documents the 7-day build of an end-to-end Retrieval-Augmented Generation system for querying 153 academic papers from arXiv. Rather than presenting a polished final result, this focuses on the **engineering journey**: a broken embedding pipeline on Day 1, a systematic retrieval optimisation that hit 100% hit rate, and a fine-tuning experiment that regressed by 28 percentage points due to training data contamination.

@@ -20,6 +20,8 @@ toc_sticky: true
   <iframe width="560" height="315" src="https://www.youtube.com/embed/BINCxvbfTgk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </div>
 
+**TL;DR**: Trained a SAC agent to complete a 3,600m TORCS race track over 9.7M steps. Hit rate was 0.85% — but the point was diagnosing three distinct failure modes (perverse reward incentives, "parking" exploitation, and PPO catastrophic forgetting) through data, not intuition.
+
 ## Abstract
 
 This report documents the development of an autonomous racing agent for the TORCS Corkscrew track using Soft Actor-Critic (SAC) and Proximal Policy Optimization (PPO). Rather than presenting a polished final result, this post focuses on the **problem-solving journey**: identifying failure modes, forming data-driven hypotheses, and implementing iterative solutions. Over 9.7M training steps across 4,349 episodes, we achieved 37 track completions (0.85%), with key insights into reward engineering, hyperparameter sensitivity, and algorithm trade-offs.
