@@ -6,7 +6,7 @@ author_profile: true
 
 ## Hi, I'm Yunbeom Choe
 
-MSc Data Science & AI student at the University of Liverpool. I build end-to-end ML systems — from reinforcement learning agents to production-ready RAG pipelines — and write honestly about what breaks along the way.
+MSc Data Science & AI student at the University of Liverpool. I build end-to-end ML systems - from reinforcement learning agents to production-ready RAG pipelines - and write honestly about what breaks along the way.
 
 ---
 
@@ -44,7 +44,7 @@ Autonomous racing agent trained on the TORCS Corkscrew track using deep reinforc
 
 **Languages**: Python, SQL  
 **ML/AI**: PyTorch, Hugging Face, LangChain, RAG, RL (SAC, PPO), LoRA fine-tuning  
-**MLOps**: FastAPI, Docker, ChromaDB, pytest
+**MLOps**: FastAPI, Docker, ChromaDB, pytest  
 **Tools**: Git, Ollama, Streamlit
 
 ---
