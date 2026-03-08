@@ -19,6 +19,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   "ML/AI Engineering Journey"
 github_username: choeyunbeom
 minimal_mistakes_skin: default
+google_site_verification: I8-B6dP1fmoQyI-YO8f9JANPiwekgmh9cDQsQs4UfQs
 search: true
 
 # Build settings
