@@ -23,7 +23,7 @@ End-to-end Retrieval-Augmented Generation system for querying academic papers fr
 - Async refactoring of the entire I/O pipeline (FastAPI + httpx), fixing 7 bugs in the process
 - Fully local inference on Apple M4 Pro via Ollama — no external API calls
 
-[Part 1: Building the system](/machine%20learning/nlp/arxiv-rag-system/) · [Part 2: Async refactoring](/machine%20learning/nlp/arxiv-rag-async-refactoring/)
+[Part 1: Building the system](/machine%20learning/nlp/arxiv-rag-system/) · [Part 2: Async refactoring](/machine%20learning/nlp/arxiv-rag-async-refactoring/) · [Part 3: LoRA Fine-Tuning](/machine%20learning/nlp/lora-finetuning-experiment/)
 
 ---
 
