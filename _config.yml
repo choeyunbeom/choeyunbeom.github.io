@@ -58,7 +58,7 @@ plugins:
 author:
   name: "Yunbeom Choe"
   avatar: "/assets/images/bio-photo.jpg"
-  bio: "MSc Data Science & AI @ University of Liverpool. Interested in Generative AI, MLOps, and Reinforcement Learning."
+  bio: "MSc Data Science & AI @ University of Liverpool. Interested in Generative AI, MLOps, and Reinforcement Learning. <a href='/career/naval-architecture-to-ai/'>How I got here →</a>"
   location: "Liverpool, UK"
   links:
     - label: "GitHub"
