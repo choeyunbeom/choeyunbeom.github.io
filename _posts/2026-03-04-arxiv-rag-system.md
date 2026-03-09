@@ -24,13 +24,13 @@ toc_sticky: true
 > Ask a natural language question → the system retrieves relevant arXiv papers → generates a cited, grounded answer using a local LLM.
 
 ![Query → answer flow with source citations and latency breakdown](/assets/images/ui_demo.gif)
-![Streamlit UI — interactive Q&A interface with source cards and latency breakdown](/assets/images/main_demo.png)
-![FastAPI Swagger UI — interactive API documentation with example requests and responses](/assets/images/swagger_demo.png)
+![Streamlit UI - interactive Q&A interface with source cards and latency breakdown](/assets/images/main_demo.png)
+![FastAPI Swagger UI - interactive API documentation with example requests and responses](/assets/images/swagger_demo.png)
 ![Interactive 3D UMAP Visualisation of Embedding Space](/assets/images/umap_demo.png)
 
 > The UI shows the full query flow: enter a question → hybrid retrieval searches 153 arXiv papers → cross-encoder reranks results → Qwen3 4B generates a cited answer. 3D UMAP visualisations map the query to the semantic space of the arXiv corpus. Latency breakdown shows retrieval vs generation time.
 
-**TL;DR**: Built an end-to-end RAG system for 153 arXiv papers in 7 days. Retrieval went from 60% to 100% hit rate through hybrid search and cross-encoder reranking. LoRA fine-tuning regressed by 28pp due to training data contamination — few-shot prompting won instead.
+**TL;DR**: Built an end-to-end RAG system for 153 arXiv papers in 7 days. Retrieval went from 60% to 100% hit rate through hybrid search and cross-encoder reranking. LoRA fine-tuning regressed by 28pp due to training data contamination - few-shot prompting won instead.
 
 ## Abstract
 
@@ -148,7 +148,7 @@ Top results:
 [3] dist=0.4133 | Morescient GAI for Software Engineering...
 ```
 
-The corpus contained dozens of RAG-specific papers. None appeared in the top results. All distances were in the 0.34–0.40 range — suspiciously high when query terms appear verbatim in many documents.
+The corpus contained dozens of RAG-specific papers. None appeared in the top results. All distances were in the 0.34–0.40 range - suspiciously high when query terms appear verbatim in many documents.
 
 ### 3.2 Debugging Process
 
@@ -223,7 +223,7 @@ After switching and re-indexing, retrieval results were correct:
 
 ---
 
-## 4. Day 3: Retrieval Optimisation — 60% to 100% Hit Rate
+## 4. Day 3: Retrieval Optimisation - 60% to 100% Hit Rate
 
 ### 4.1 Baseline
 
@@ -248,7 +248,7 @@ Target: **80%+ Hit Rate**.
 
 **Finding: Token vs. Word Count Mismatch**
 
-Increasing chunk size to 256 words caused batch failures during indexing. Academic text — with LaTeX, markdown table fragments (`|Col1|Col2|...`), and special characters — produces 2–3× more tokens than expected word count suggests.
+Increasing chunk size to 256 words caused batch failures during indexing. Academic text - with LaTeX, markdown table fragments (`|Col1|Col2|...`), and special characters - produces 2–3× more tokens than expected word count suggests.
 
 ```
 Standard English text: ~1.27 tokens/word
@@ -266,7 +266,7 @@ Ollama returns HTTP 400 for inputs exceeding `mxbai-embed-large`'s 512-token con
 | 128 words / 64 overlap | 60.0% | 0.51 | ~5 |
 | **200 words / 100 overlap** | **66.7%** | **0.42** | **116** |
 
-MRR decreased slightly — larger chunks from tangentially related papers now ranked higher. This was expected and would be corrected by reranking.
+MRR decreased slightly - larger chunks from tangentially related papers now ranked higher. This was expected and would be corrected by reranking.
 
 ---
 
@@ -305,7 +305,7 @@ def _rrf_fusion(self, vector_ranks: dict, bm25_ranks: dict, k: int = 60) -> list
 
 ### 4.4 Experiment 3: Cross-Encoder Reranking
 
-**The idea**: A bi-encoder scores query and document independently, then computes similarity. A cross-encoder processes both jointly, attending to their interaction — much more accurate, but too slow to run on the full corpus. Solution: fetch top-40 candidates via hybrid search, then rerank with the cross-encoder to produce final top-5.
+**The idea**: A bi-encoder scores query and document independently, then computes similarity. A cross-encoder processes both jointly, attending to their interaction - much more accurate, but too slow to run on the full corpus. Solution: fetch top-40 candidates via hybrid search, then rerank with the cross-encoder to produce final top-5.
 
 **Configuration**: `cross-encoder/ms-marco-MiniLM-L-6-v2` (22M params), deduplication by `arxiv_id::section`.
 
@@ -338,9 +338,9 @@ def _rrf_fusion(self, vector_ranks: dict, bm25_ranks: dict, k: int = 60) -> list
 | MRR | 0.78 | **0.82** |
 | Keyword Coverage | 69% | **75%** |
 
-The reduction in total chunks (5,110 → 2,885) is expected — 450 tokens ≈ 300–350 words, producing fewer but more contextually complete chunks.
+The reduction in total chunks (5,110 → 2,885) is expected - 450 tokens ≈ 300–350 words, producing fewer but more contextually complete chunks.
 
-**Key takeaway**: Text splitting in RAG should always use the embedding model's tokeniser, not word count. This is not a minor optimisation — it is a correctness requirement.
+**Key takeaway**: Text splitting in RAG should always use the embedding model's tokeniser, not word count. This is not a minor optimisation - it is a correctness requirement.
 
 ---
 
@@ -363,7 +363,7 @@ The reduction in total chunks (5,110 → 2,885) is expected — 450 tokens ≈ 3
 
 **Goal**: Fine-tune Qwen3 4B with LoRA to improve three RAG-specific behaviours:
 1. Answer only from provided context, cite paper titles
-2. Output clean prose — no markdown headers or bullet points
+2. Output clean prose - no markdown headers or bullet points
 3. Refuse politely when context is insufficient
 
 **Training data**: 1,997 synthetic Q&A pairs generated from the 153-paper corpus using Qwen3 4B itself via Ollama's `format: json` parameter.
@@ -416,7 +416,7 @@ Total training time: **6.8 hours**.
 
 The fine-tuned model scored **28.4 percentage points lower** on keyword coverage than zero-shot, with **9× the word count** and **2.4× the latency**.
 
-BERTScore F1 dropped from 0.805 (few-shot) to 0.683 (fine-tuned) — confirming the regression was real at the semantic level, not just a keyword artifact.
+BERTScore F1 dropped from 0.805 (few-shot) to 0.683 (fine-tuned) - confirming the regression was real at the semantic level, not just a keyword artifact.
 
 **Per-question breakdown (keyword coverage):**
 
@@ -454,13 +454,13 @@ The model parroted the system prompt before answering, inflating word counts to 
 3. When parsed as training answers, those fragments were included in training targets
 4. The model learned that a valid response **begins with system prompt text**
 
-This is subtle. The data looked correct at a glance — actual answer content was present. The system prompt text preceding it was noise the model learned to treat as signal.
+This is subtle. The data looked correct at a glance - actual answer content was present. The system prompt text preceding it was noise the model learned to treat as signal.
 
 ---
 
 ### 5.4 Why Few-Shot Prompt Engineering Won
 
-The few-shot approach added ~350 tokens of examples covering the same three behaviours — grounded answering, multi-paper synthesis, and refusal:
+The few-shot approach added ~350 tokens of examples covering the same three behaviours - grounded answering, multi-paper synthesis, and refusal:
 
 ```
 Few-shot overhead:     ~350 tokens
@@ -474,11 +474,11 @@ Keyword coverage gain: +1.6%p vs zero-shot
 
 ### 5.5 What I Would Do Differently
 
-1. **Validate training data for instruction leakage** — automated checks rejecting any training answer containing system prompt fragments
-2. **Use a separate model for data generation** — generating data with the same model that will be fine-tuned, with thinking mode enabled, creates contamination risk
-3. **Establish the few-shot baseline first** — fine-tune only if there is a measurable gap that prompt engineering cannot close
-4. **Use a larger base model (7B+)** — at 4B parameters, LoRA fine-tuning on 2K examples shifts style while eroding topic coverage
-5. **Quantise both models identically** — base used Q4_K_M, fine-tuned used Q8_0; this introduces a confounding variable in evaluation
+1. **Validate training data for instruction leakage** - automated checks rejecting any training answer containing system prompt fragments
+2. **Use a separate model for data generation** - generating data with the same model that will be fine-tuned, with thinking mode enabled, creates contamination risk
+3. **Establish the few-shot baseline first** - fine-tune only if there is a measurable gap that prompt engineering cannot close
+4. **Use a larger base model (7B+)** - at 4B parameters, LoRA fine-tuning on 2K examples shifts style while eroding topic coverage
+5. **Quantise both models identically** - base used Q4_K_M, fine-tuned used Q8_0; this introduces a confounding variable in evaluation
 
 ---
 
@@ -636,9 +636,9 @@ More importantly, the debugging methodology is transferable:
 ```
 1. Isolate each layer independently (embedding, retrieval, generation)
 2. Run quantitative sanity checks before building on any component
-3. Log everything — failure modes are discovered in the data, not by intuition
+3. Log everything - failure modes are discovered in the data, not by intuition
 4. Establish baselines before investing in complex approaches (few-shot before fine-tuning)
-5. Report regressions honestly — they teach more than successes
+5. Report regressions honestly - they teach more than successes
 ```
 
 ---

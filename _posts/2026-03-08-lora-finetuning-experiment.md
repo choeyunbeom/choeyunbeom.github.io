@@ -17,23 +17,23 @@ toc_icon: "cog"
 toc_sticky: true
 ---
 
-> This post is a deep dive into the fine-tuning experiment from the [arXiv RAG System](/machine%20learning/nlp/arxiv-rag-system/). That post summarised it in a section — this one documents every detail: data generation, training pipeline, evaluation, and the root cause of the 28pp regression.
+> This post is a deep dive into the fine-tuning experiment from the [arXiv RAG System](/machine%20learning/nlp/arxiv-rag-system/). That post summarised it in a section - this one documents every detail: data generation, training pipeline, evaluation, and the root cause of the 28pp regression.
 
 ---
 
-**TL;DR**: Fine-tuned Qwen3 4B with LoRA for RAG-specific behaviour. After 6.8 hours of training, the model regressed 28pp on keyword coverage vs zero-shot. Root cause: training data contamination — the model learned to parrot system prompt instructions verbatim before answering, inflating word counts to ~1,600. Few-shot prompting won on every metric.
+**TL;DR**: Fine-tuned Qwen3 4B with LoRA for RAG-specific behaviour. After 6.8 hours of training, the model regressed 28pp on keyword coverage vs zero-shot. Root cause: training data contamination - the model learned to parrot system prompt instructions verbatim before answering, inflating word counts to ~1,600. Few-shot prompting won on every metric.
 
 ---
 
 ## Abstract
 
-This post documents the complete LoRA fine-tuning experiment run as part of the arXiv RAG project. The goal was to teach Qwen3 4B three RAG-specific behaviours: grounded answering, prose output, and context-aware refusal. Instead, it revealed a subtle but catastrophic data contamination pattern — and why few-shot prompt engineering is often the right baseline to beat first.
+This post documents the complete LoRA fine-tuning experiment run as part of the arXiv RAG project. The goal was to teach Qwen3 4B three RAG-specific behaviours: grounded answering, prose output, and context-aware refusal. Instead, it revealed a subtle but catastrophic data contamination pattern - and why few-shot prompt engineering is often the right baseline to beat first.
 
 **Key Findings:**
 - Training data contamination via Qwen3's thinking mode caused every fine-tuned response to begin with system prompt text verbatim
-- Keyword coverage dropped from 78.0% (few-shot) to 48.0% (fine-tuned) — a 30pp regression
+- Keyword coverage dropped from 78.0% (few-shot) to 48.0% (fine-tuned) - a 30pp regression
 - BERTScore F1 dropped from 0.805 to 0.683, confirming the regression was semantic, not a keyword artifact
-- Average word count exploded from 177 to 1,614 — nearly 10× — due to instruction parroting
+- Average word count exploded from 177 to 1,614 - nearly 10× - due to instruction parroting
 - 6.8 hours of training, defeated by ~350 tokens of few-shot examples
 
 ---
@@ -43,9 +43,9 @@ This post documents the complete LoRA fine-tuning experiment run as part of the 
 The arXiv RAG system used Qwen3 4B zero-shot at launch. The hypothesis: fine-tuning on domain-specific Q&A pairs would improve three behaviours that zero-shot prompting handles inconsistently.
 
 **Target behaviours:**
-1. **Context grounding** — answer only from provided context, cite paper titles
-2. **Prose output** — no markdown headers or bullet points in answers
-3. **Proper refusal** — decline politely when the retrieved context is insufficient
+1. **Context grounding** - answer only from provided context, cite paper titles
+2. **Prose output** - no markdown headers or bullet points in answers
+3. **Proper refusal** - decline politely when the retrieved context is insufficient
 
 These are stylistic constraints, not knowledge requirements. The question was whether LoRA fine-tuning on 2K synthetic examples could reliably instil them.
 
@@ -63,7 +63,7 @@ Generated 1,997 synthetic Q&A pairs from the 153-paper corpus using Qwen3 4B via
 | Synthesis (20%) | 397 | Two-paper context → comparative prose answer |
 | Refusal (20%) | 400 | Irrelevant context → polite refusal |
 
-**Token statistics**: min 257, max 841, mean 377 — all within 2048 max_length, 0 truncated.
+**Token statistics**: min 257, max 841, mean 377 - all within 2048 max_length, 0 truncated.
 
 **Generation speed**: ~33 pairs/min (1,997 pairs in 67 minutes).
 
@@ -78,7 +78,7 @@ Qwen3's `<think>` feature consumes output tokens for internal reasoning before p
 
 **Fix**: combining Ollama's `format: json` with `num_predict: 4096` causes the model to produce structured JSON within its thinking field, which can be extracted programmatically. This reduced generation time from ~60s/pair to ~2s/pair.
 
-This detail matters — it planted the seed of the contamination problem described in Section 5.
+This detail matters - it planted the seed of the contamination problem described in Section 5.
 
 ---
 
@@ -88,7 +88,7 @@ This detail matters — it planted the seed of the contamination problem describ
 
 - **Hardware**: Apple M4 Pro, 48GB unified memory, MPS backend
 - **Framework**: trl 0.29.0 (SFTTrainer + SFTConfig), PEFT 0.15.1
-- **Base model**: Qwen3-4B in bf16 (not 4-bit — bitsandbytes is unstable on MPS)
+- **Base model**: Qwen3-4B in bf16 (not 4-bit - bitsandbytes is unstable on MPS)
 
 ### 3.2 LoRA Configuration
 
@@ -128,7 +128,7 @@ This detail matters — it planted the seed of the contamination problem describ
 - **Throughput**: 0.231 samples/sec (~50s/step)
 - **Best checkpoint**: Epoch 2 (auto-selected via `load_best_model_at_end=True`)
 
-Epoch 3 showed training loss continuing to decrease while validation loss plateaued — the model began memorising rather than generalising.
+Epoch 3 showed training loss continuing to decrease while validation loss plateaued - the model began memorising rather than generalising.
 
 ### Model Conversion Pipeline
 
@@ -148,9 +148,9 @@ echo 'FROM data/qwen3-4b-rag.gguf' > Modelfile
 ollama create qwen3-4b-rag -f Modelfile
 ```
 
-**Note**: `save_pretrained()` only saves model weights, not tokenizer files. Required manual copy of `tokenizer.json`, `tokenizer_config.json`, `vocab.json`, `merges.txt` from the base model — a silent failure if missed.
+**Note**: `save_pretrained()` only saves model weights, not tokenizer files. Required manual copy of `tokenizer.json`, `tokenizer_config.json`, `vocab.json`, `merges.txt` from the base model - a silent failure if missed.
 
-### Initial Sanity Test — A False Positive
+### Initial Sanity Test - A False Positive
 
 The first test loaded the LoRA adapter directly, bypassing the RAG pipeline entirely:
 
@@ -174,9 +174,9 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 
 The response was concise and factually correct. It looked fine.
 
-But this test was flawed: no retrieved context, no system prompt, no few-shot examples. It tested the bare adapter in isolation — not the production RAG system.
+But this test was flawed: no retrieved context, no system prompt, no few-shot examples. It tested the bare adapter in isolation - not the production RAG system.
 
-The real test — running through Ollama with the actual system prompt and retrieved context — revealed something different entirely:
+The real test - running through Ollama with the actual system prompt and retrieved context - revealed something different entirely:
 
 ```
 % ollama run qwen3-4b-rag "What is QLoRA?"
@@ -200,7 +200,7 @@ Question: Can QLo. 0
 [terminated with Ctrl+C]
 ```
 
-The model could not stop. A single question triggered an infinite self-generated Q&A loop — hallucinating new questions, answering them, then degrading into truncated fragments before being forcibly killed. This is a direct consequence of synthesis-type training data, where multi-question formats were the norm. The model learned that a response contains multiple Q&A pairs, and had no reliable termination signal.
+The model could not stop. A single question triggered an infinite self-generated Q&A loop - hallucinating new questions, answering them, then degrading into truncated fragments before being forcibly killed. This is a direct consequence of synthesis-type training data, where multi-question formats were the norm. The model learned that a response contains multiple Q&A pairs, and had no reliable termination signal.
 
 A proper sanity test must mirror production conditions exactly. Testing the adapter in isolation hid the failure completely.
 
@@ -223,7 +223,7 @@ Ran the same 15-question benchmark on all three configurations under identical r
 
 The fine-tuned model scored **30pp lower** on keyword coverage than few-shot, with **9× the word count** and **2.4× the latency**.
 
-BERTScore dropped from 0.805 (few-shot) to 0.683 (fine-tuned) — the regression was real at the semantic level, not a keyword artifact.
+BERTScore dropped from 0.805 (few-shot) to 0.683 (fine-tuned) - the regression was real at the semantic level, not a keyword artifact.
 
 ### 5.2 Per-Question Breakdown
 
@@ -271,7 +271,7 @@ QLoRA is a method that reduces memory usage..."
 
 **Failure Mode 2: Infinite Q&A generation**
 
-Without a system prompt, the model hallucinated additional questions and answered them in a loop — eventually degrading into truncated fragments that repeated indefinitely until forcibly terminated (documented in Section 4). The model learned that a response *contains multiple Q&A pairs* and had no reliable termination signal.
+Without a system prompt, the model hallucinated additional questions and answered them in a loop - eventually degrading into truncated fragments that repeated indefinitely until forcibly terminated (documented in Section 4). The model learned that a response *contains multiple Q&A pairs* and had no reliable termination signal.
 
 Both failures trace to the same root cause: contaminated training data.
 
@@ -282,7 +282,7 @@ Both failures trace to the same root cause: contaminated training data.
 3. When parsed as training answers, those fragments were included in training targets
 4. The model learned that a valid response **begins with system prompt text**
 
-This is subtle. The data looked correct at a glance — actual answer content was present. The system prompt text preceding it was noise the model learned to treat as signal.
+This is subtle. The data looked correct at a glance - actual answer content was present. The system prompt text preceding it was noise the model learned to treat as signal.
 
 **Automated check that would have caught this:**
 
@@ -298,7 +298,7 @@ def validate_training_sample(answer: str, system_prompt: str) -> bool:
 
 ### 6.3 Contributing Factors
 
-**Catastrophic forgetting in small models**: At 4B parameters, LoRA fine-tuning on 2K examples shifted response style but degraded topic coverage. The model's capacity is limited — new behaviours came at the cost of existing capabilities.
+**Catastrophic forgetting in small models**: At 4B parameters, LoRA fine-tuning on 2K examples shifted response style but degraded topic coverage. The model's capacity is limited - new behaviours came at the cost of existing capabilities.
 
 **Quantisation gap**: The base model ran as `qwen3:4b` (Q4_K_M), while the fine-tuned model was Q8_0. Different quantisation methods affect token probability distributions, introducing a confounding variable in the comparison.
 
@@ -316,18 +316,18 @@ Keyword coverage gain: +1.6%p vs zero-shot
 
 For a 4B-parameter model: **350 tokens of examples outperformed 6.8 hours of LoRA fine-tuning on every metric.**
 
-The pattern generalises: for small models with style constraints, prompt engineering is cheap, reversible, and often sufficient. Fine-tuning makes sense when there is a clear gap that prompting cannot close — establish that baseline first.
+The pattern generalises: for small models with style constraints, prompt engineering is cheap, reversible, and often sufficient. Fine-tuning makes sense when there is a clear gap that prompting cannot close - establish that baseline first.
 
 ---
 
 ## 8. What I Would Do Differently
 
-1. **Validate training data for instruction leakage** — automated checks rejecting any training answer containing system prompt fragments, run before any training begins
-2. **Use a separate model for data generation** — generating data with the same model that will be fine-tuned, with thinking mode enabled, creates contamination risk. Use a different (typically larger) model
-3. **Establish the few-shot baseline first** — fine-tune only if there is a measurable gap that prompt engineering cannot close
-4. **Use a larger base model (7B+)** — at 4B parameters, LoRA fine-tuning on 2K examples shifts style while eroding topic coverage
-5. **Quantise both models identically** — Q8_0 for both base and fine-tuned for a fair comparison
-6. **1 epoch with lower LR (5e-5)** — minimise forgetting while still imparting style changes
+1. **Validate training data for instruction leakage** - automated checks rejecting any training answer containing system prompt fragments, run before any training begins
+2. **Use a separate model for data generation** - generating data with the same model that will be fine-tuned, with thinking mode enabled, creates contamination risk. Use a different (typically larger) model
+3. **Establish the few-shot baseline first** - fine-tune only if there is a measurable gap that prompt engineering cannot close
+4. **Use a larger base model (7B+)** - at 4B parameters, LoRA fine-tuning on 2K examples shifts style while eroding topic coverage
+5. **Quantise both models identically** - Q8_0 for both base and fine-tuned for a fair comparison
+6. **1 epoch with lower LR (5e-5)** - minimise forgetting while still imparting style changes
 
 ---
 
@@ -335,12 +335,12 @@ The pattern generalises: for small models with style constraints, prompt enginee
 
 The fine-tuning experiment failed, but the failure was informative:
 
-- **Caught training data contamination** via response inspection — visible in the first few outputs
+- **Caught training data contamination** via response inspection - visible in the first few outputs
 - **Confirmed the regression was semantic** using BERTScore alongside keyword coverage
 - **Demonstrated that few-shot prompting outperformed LoRA fine-tuning** for this model size and task
 - **Identified the quantisation comparison problem** as a confounding variable for future experiments
 
-The core lesson: synthetic data generated by the same model you are fine-tuning, with thinking mode enabled, carries contamination risk that is invisible until you evaluate outputs systematically. Automated validation of training data is not optional — it is the first thing to build before running any fine-tuning pipeline.
+The core lesson: synthetic data generated by the same model you are fine-tuning, with thinking mode enabled, carries contamination risk that is invisible until you evaluate outputs systematically. Automated validation of training data is not optional - it is the first thing to build before running any fine-tuning pipeline.
 
 ---
 

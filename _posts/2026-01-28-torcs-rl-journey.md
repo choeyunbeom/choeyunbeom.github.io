@@ -20,7 +20,7 @@ toc_sticky: true
   <iframe width="560" height="315" src="https://www.youtube.com/embed/BINCxvbfTgk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </div>
 
-**TL;DR**: Trained a SAC agent to complete a 3,600m TORCS race track over 9.7M steps. Hit rate was 0.85% — but the point was diagnosing three distinct failure modes (perverse reward incentives, "parking" exploitation, and PPO catastrophic forgetting) through data, not intuition.
+**TL;DR**: Trained a SAC agent to complete a 3,600m TORCS race track over 9.7M steps. Hit rate was 0.85% - but the point was diagnosing three distinct failure modes (perverse reward incentives, "parking" exploitation, and PPO catastrophic forgetting) through data, not intuition.
 
 ## Abstract
 
