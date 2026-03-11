@@ -1,0 +1,223 @@
+---
+title: "From arXiv to SEC: Building a Multi-Agent Financial Report Analyst with LangGraph"
+date: 2026-03-11
+categories:
+  - Machine Learning
+  - NLP
+tags:
+  - RAG
+  - LLM
+  - LangGraph
+  - Multi-Agent
+  - SEC EDGAR
+  - ChromaDB
+  - Groq
+toc: true
+toc_label: "Table of Contents"
+toc_icon: "cog"
+toc_sticky: true
+---
+
+# From arXiv to SEC: Building a Multi-Agent Financial Report Analyst with LangGraph
+
+**TL;DR**: Extended my arXiv RAG system to financial filings (SEC EDGAR + Companies House) in 3 days. The key upgrade: single-agent Q&A → 3-agent pipeline (Retriever → Analyzer → Critic) with parallel analysis and a hallucination check loop. 24/24 unit tests passing. Several bugs caught and fixed along the way.
+
+---
+
+## Why Extend to Financial Domain?
+
+My [arXiv RAG system](https://choeyunbeom.github.io/machine%20learning/nlp/2026/03/04/arxiv-rag-system.html) got retrieval to 100% hit rate, but the use case was narrow — academic Q&A. Financial filings are a more demanding domain:
+
+- Documents are **dense with numbers** — revenue figures, risk disclosures, forward-looking statements
+- **Hallucinations are costly** — a wrong number in a financial analysis is meaningfully worse than a vague answer about a research paper
+- **Multiple angles matter** — you don't want one answer, you want risk, growth, and competitive context simultaneously
+
+This pushed me toward a multi-agent architecture instead of a single-agent Q&A loop.
+
+---
+
+## Architecture
+
+```
+User Query (e.g. "AAPL" or "Apple")
+    ↓
+[Input Resolver] — ticker/name → CIK → latest 10-K
+    ↓
+[Retriever Agent] — ChromaDB dense + BM25 hybrid + RRF + cross-encoder rerank
+    ↓
+[Analyzer Agent] — Risk / Growth / Competitor (runs in parallel)
+    ↓
+[Critic Agent] — citation check → retry if >30% uncited (max 2x)
+    ↓
+Final Report with source citations
+```
+
+The key design decision: **why 3 agents instead of 1?**
+
+A single agent doing risk + growth + competitor analysis sequentially has two problems. First, the context window gets polluted — each analysis bleeds into the next. Second, it's slow — 3 sequential LLM calls vs 3 parallel. `asyncio.gather` with `asyncio.to_thread` (since Groq's SDK is sync) cuts wall time to roughly `max(t_risk, t_growth, t_competitor)` instead of their sum.
+
+The Critic exists because financial analysis is high-stakes. An uncited claim about "revenue growth of 15%" that doesn't appear anywhere in the retrieved chunks is exactly the kind of hallucination that looks plausible but is wrong. The Critic checks citation coverage and triggers a retry if >30% of claims are unsupported.
+
+---
+
+## Day 1 — Retrieval Foundation
+
+### SEC EDGAR Integration
+
+EDGAR's API is well-documented but quirky. The ticker→CIK mapping requires fetching the full company tickers JSON (several MB) and doing a linear scan. The CIK then unlocks the filings endpoint:
+
+```python
+# Ticker → CIK
+GET https://www.sec.gov/files/company_tickers.json
+
+# CIK → latest 10-K metadata
+GET https://data.sec.gov/submissions/CIK{cik:010d}.json
+
+# Download filing
+GET https://www.sec.gov/Archives/edgar/data/{cik}/{accession}/{filename}
+```
+
+**Bug 1: ticker regex was too loose.** `re.fullmatch(r"[A-Za-z]{1,5}", input)` matched "Apple" (5 chars, all alpha) as a ticker, then failed when "APPLE" wasn't in the ticker map. Fixed to `[A-Z]{1,5}` — uppercase only.
+
+**Bug 2: EDGAR search API field rename.** `hits[0]["_source"]["entity_id"]` had been renamed to `ciks` (a list). Silent KeyError that only surfaced when testing company name search.
+
+**Bug 3: HTML entities in retrieved chunks.** EDGAR's HTML filings are full of `&#160;` (non-breaking space), `&#8217;` (right single quotation mark), etc. Regex-only HTML stripping left these raw in the chunks, polluting retrieved context. Fixed with `html.unescape()` after tag removal.
+
+### ChromaDB Deduplication
+
+Re-ingesting the same company caused `DuplicateIDError`. The original chunk ID was `sha256(content[:100])` — too short, leading to collisions between chunks with identical openings (e.g. multiple pages starting with "APPLE INC.").
+
+Fixed to `sha256(f"{source}:{filing_date}:{global_index}:{content[:80]}")`. The global index ensures uniqueness even for near-identical chunks.
+
+### Smoke Test Result
+
+```
+AAPL 10-K (2025-10-31, HTML) → 575 chunks → 575/575 indexed ✓
+Q: "What are Apple's main risk factors?"
+→ 5 relevant chunks retrieved, Groq answered with citations ✓
+```
+
+---
+
+## Day 2 — Multi-Agent Graph
+
+### LangGraph StateGraph
+
+LangGraph's `StateGraph` is the right tool here — it manages state transitions explicitly and handles conditional retry edges cleanly:
+
+```python
+graph.add_conditional_edges(
+    "critic",
+    should_retry,
+    {"retry": "retriever", "done": END},
+)
+```
+
+`should_retry` checks `state["critique"] == "insufficient" and state["retry_count"] < 2`. Simple, but the `retry_count` guard is critical — without it, a consistently low-quality retrieval result loops forever.
+
+### Parallel Analyzer
+
+```python
+async def analyzer_node(state: AgentState) -> dict:
+    risk, growth, competitors = await asyncio.gather(
+        analyze_risk(state["documents"]),
+        analyze_growth(state["documents"]),
+        analyze_competitors(state["documents"]),
+    )
+    ...
+```
+
+Each `analyze_*` function calls `asyncio.to_thread(_call_groq, prompt)`. This is concurrent threading, not true parallelism — worth being precise about in interviews. But for I/O-bound LLM API calls, it behaves like parallelism: all three HTTP requests are in-flight simultaneously.
+
+### Critic Agent
+
+The Critic uses LLM-as-judge with a structured output format:
+
+```
+CITED_COUNT: <n>
+UNCITED_COUNT: <n>
+VERDICT: sufficient | insufficient
+FEEDBACK: <one sentence>
+```
+
+One design tradeoff: `_parse_verdict` defaults to `"sufficient"` on malformed responses. This is fail-open — if the LLM produces garbled output, the analysis passes through. The alternative (fail-closed, return `"insufficient"`) would cause unnecessary retries and potentially hit the max retry limit on transient formatting failures. For a prototype, fail-open is the right call; production would want structured outputs (JSON mode) to eliminate the ambiguity.
+
+---
+
+## Day 3 — Polish + Ship
+
+FastAPI `/analyze` endpoint, Streamlit UI, Langfuse tracing. The UI connects to FastAPI via `httpx` — agents stay server-side, UI stays thin.
+
+Langfuse tracing is optional: if `LANGFUSE_PUBLIC_KEY` isn't set, `trace_graph()` becomes a no-op context manager. The reason this matters: during development you're running without Langfuse keys constantly, and a hard import error or missing-credential exception on every request is the kind of friction that makes you rip monitoring out entirely. No-op by default means tracing is always ready to switch on, never a blocker.
+
+The Streamlit UI uses a 180-second `httpx` timeout. That's not arbitrary — the full pipeline (ingest if cold, embed, hybrid retrieve, 3 parallel Groq calls, Critic) can take 60-90 seconds on first run for a company not yet in ChromaDB. 30 seconds would time out on cold starts; 180 covers it with room.
+
+### Companies House Integration
+
+Companies House was noticeably smoother than SEC EDGAR. HTTP Basic Auth with the API key as username and empty password, then two endpoints:
+
+```python
+GET /search/companies?q={name}          # → company_number
+GET /company/{number}/filing-history    # → document_id per filing
+GET document-api.../document/{id}/content  # → PDF (requires Accept: application/pdf header)
+```
+
+The one gotcha: the document download endpoint requires an explicit `Accept: application/pdf` header — without it you get a metadata JSON response instead of the binary PDF. That's it. No HTML filing fallback, no entity decoding edge cases, no field renames. After the EDGAR integration, it felt almost too easy.
+
+---
+
+## Post-Ship: External Code Review
+
+After shipping, I got a code review that caught several real issues:
+
+**1. HybridRetriever was never connected to the agent pipeline.**
+
+`hybrid_retriever.py` had the full dense + BM25 + RRF + cross-encoder implementation, but `retriever_node` was doing plain ChromaDB dense search only. README said "hybrid retrieval" — it wasn't. Fixed by calling `HybridRetriever.retrieve()` from `retriever_node`, loading the full ChromaDB collection for BM25 corpus construction.
+
+Performance note: `_load_all_documents()` fetches the entire collection on every query to build BM25 and load the cross-encoder. For 575 chunks this is fine (~1-2s overhead). At production scale, the right fix is to cache the `HybridRetriever` instance per collection and invalidate on new ingestion.
+
+**2. `resp.json()` called outside `with` block.**
+
+`_ticker_to_cik` had `data = resp.json()` after the `with httpx.Client(...) as client:` block closed. httpx buffers responses so it works, but it violates the context manager's intent. Moved inside the `with` block.
+
+**3. Test coverage gap.**
+
+12 agent-level tests, zero ingestion tests. The ingestion layer is the most likely to break (external API changes, HTML format changes, etc.). Added 8 SEC EDGAR tests and 4 Companies House tests covering resolve, fetch, error handling, and HTML stripping.
+
+---
+
+## What's Different from arXiv RAG
+
+| | arXiv RAG | finscope |
+|---|---|---|
+| Domain | Academic papers | Financial filings (10-K, annual reports) |
+| Agent architecture | Single-agent | Multi-agent (Retriever → Analyzer → Critic) |
+| Analysis | Single Q&A | Parallel Risk / Growth / Competitor |
+| Hallucination check | None | Critic agent with citation check + retry loop |
+| Data sources | arXiv API | SEC EDGAR + Companies House |
+| Chunking | Default | 512-token with financial metadata |
+
+---
+
+## Results
+
+Tested on Apple (AAPL) 10-K filing (2025-10-31):
+
+| Metric | Result |
+|---|---|
+| Filing ingested | 575 chunks from HTML 10-K |
+| Retrieval (hybrid) | 8 chunks retrieved per query |
+| Critic verdict (typical) | `sufficient` on first pass |
+| Critic retry triggered | Not observed in testing — all queries passed on first pass |
+| End-to-end latency | ~15s (Groq llama-3.3-70b, 3 parallel analyses) |
+| Unit tests | 24/24 passing |
+
+---
+
+## What's Next
+
+The Critic's hallucination check is currently a binary `sufficient/insufficient` verdict with no quantitative eval — and the retry loop never triggered in testing, which means either the retrieval is good enough that the Critic is always satisfied, or the Critic is too lenient. Without eval data, I can't tell which.
+
+The concrete next step: build a small eval set — 10 question/answer pairs each from AAPL and MSFT 10-Ks, measure precision@5 on retrieval and citation accuracy on the Critic's verdicts. That gives two numbers: did the right chunks come back, and did the Critic correctly flag uncited claims? If citation accuracy is high, the retry loop is working as intended. If it's low, the Critic prompt needs tightening — probably moving to JSON mode to eliminate malformed response defaults.
+
+Code: [github.com/choeyunbeom/finscope](https://github.com/choeyunbeom/finscope)
