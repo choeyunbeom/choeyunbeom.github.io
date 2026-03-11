@@ -255,8 +255,8 @@ Tested on Apple (AAPL) 10-K filing (2025-10-31):
 
 ## What's Next
 
-The Critic's hallucination check is currently a binary `sufficient/insufficient` verdict with no quantitative eval — and the retry loop never triggered in testing, which means either the retrieval is good enough that the Critic is always satisfied, or the Critic is too lenient. Without eval data, I can't tell which.
+The retry loop never triggered in testing. I traced this: a representative Tesla query returned `CITED_COUNT: 14, UNCITED_COUNT: 2` (87.5% cited), well above the 30% uncited threshold. The `temperature=0.1` + context-only prompt + llama-3.3-70b combination is suppressing hallucination at the Analyzer stage — the Critic is working correctly, it just rarely has cause to retry.
 
-The concrete next step: build a small eval set — 10 question/answer pairs each from AAPL and MSFT 10-Ks, measure precision@5 on retrieval and citation accuracy on the Critic's verdicts. That gives two numbers: did the right chunks come back, and did the Critic correctly flag uncited claims? If citation accuracy is high, the retry loop is working as intended. If it's low, the Critic prompt needs tightening — probably moving to JSON mode to eliminate malformed response defaults.
+The remaining question is whether the Critic would catch a genuinely hallucinated claim if one slipped through. That's still worth testing with a synthetic eval set: inject a known-false claim into the analysis, verify the Critic returns `insufficient`. The eval plan stands — it's now measuring Critic sensitivity rather than basic functionality.
 
 Code: [github.com/choeyunbeom/finscope](https://github.com/choeyunbeom/finscope)
