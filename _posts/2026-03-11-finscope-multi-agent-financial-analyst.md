@@ -186,6 +186,45 @@ Performance note: `_load_all_documents()` fetches the entire collection on every
 
 ---
 
+## Post-Ship Bug Fix: "apple" Returned a Hotel REIT
+
+After the code review fixes, I ran the system end-to-end with `company: apple`. The report came back about cybersecurity threats, REIT qualification risks, and hotel management companies. Apple Inc. does not own 217 hotels.
+
+**Root cause 1: case-sensitive ticker regex.**
+
+`resolve_to_cik` checked if input matched `[A-Z]{1,5}` before attempting ticker lookup. Lowercase `"apple"` failed that check and fell through to company name search — which is where things went wrong.
+
+**Root cause 2: wrong company name search API.**
+
+`_search_company` was using EDGAR's full-text search endpoint (`/LATEST/search-index`), which ranks results by filing recency and keyword frequency — not company size or relevance. "Apple Hospitality REIT" had more recent filings and its name literally starts with "apple", so it came back first. Apple Inc. (CIK 320193) was somewhere further down the list.
+
+The fix was to switch to EDGAR's `/browse-edgar` company search endpoint with `output=atom`. This returns companies ranked by relevance and market presence — Apple Inc. comes back first for `"apple"`, ahead of the REIT. The `resolve_to_cik` input handling was also fixed to uppercase before the ticker regex check, with a try/except fallback to name search if the ticker isn't found:
+
+```python
+def resolve_to_cik(self, user_input: str) -> str:
+    stripped = user_input.strip()
+    upper = stripped.upper()
+    if re.fullmatch(r"[A-Z]{1,5}", upper):
+        try:
+            return self._ticker_to_cik(upper)
+        except ValueError:
+            pass
+    return self._search_company(stripped)
+```
+
+Verification:
+```
+apple  → CIK 320193  (Apple Inc.)   ✓
+AAPL   → CIK 320193  (Apple Inc.)   ✓
+Tesla  → CIK 1318605 (Tesla Inc.)   ✓
+```
+
+**Root cause 3: retriever fallback leaked cross-company data.**
+
+The retriever was designed to filter ChromaDB by `company` metadata. But if the filter returned zero results, it fell back to loading the full collection — meaning a query for "apple" with no Apple data in ChromaDB would return whatever happened to be there (in this case, Tesla and the REIT). The fallback was removed entirely. If the company filter returns nothing, the pipeline returns empty documents and the Critic marks it insufficient. The user gets a clear "no data" outcome rather than silently wrong data.
+
+---
+
 ## What's Different from arXiv RAG
 
 | | arXiv RAG | finscope |
