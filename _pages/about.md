@@ -12,6 +12,21 @@ MSc Data Science & AI student at the University of Liverpool. I build end-to-end
 
 ## Projects
 
+### FinScope - Multi-Agent Financial Report Analyst
+
+Multi-agent RAG system that analyses SEC EDGAR and Companies House filings through a 3-agent pipeline.
+
+- **Stack**: LangGraph, Groq (llama-3.3-70b), ChromaDB, FastAPI, Streamlit, Docker
+- Retriever → Analyzer → Critic pipeline with conditional retry loop
+- Parallel Risk / Growth / Competitor analysis via `asyncio.gather`
+- Hybrid retrieval (dense + BM25 + RRF + cross-encoder rerank)
+- Critic agent: LLM-as-judge hallucination check with fail-open design and retry guard
+- Extended from arXiv RAG - same retrieval core, new multi-agent orchestration layer
+
+[Read the post](/machine%20learning/nlp/finscope-multi-agent-financial-analyst/)
+
+---
+
 ### arXiv RAG System
 
 End-to-end Retrieval-Augmented Generation system for querying academic papers from arXiv.
@@ -43,8 +58,8 @@ Autonomous racing agent trained on the TORCS Corkscrew track using deep reinforc
 ## Skills
 
 **Languages**: Python, SQL  
-**ML/AI**: PyTorch, Hugging Face, LangChain, RAG, RL (SAC, PPO), LoRA fine-tuning  
-**MLOps**: FastAPI, Docker, ChromaDB, pytest  
+**ML/AI**: PyTorch, Hugging Face, LangChain, LangGraph, RAG, Multi-Agent Systems, RL (SAC, PPO), LoRA fine-tuning
+**MLOps**: FastAPI, Docker, ChromaDB, pytest, GitHub Actions
 **Tools**: Git, Ollama, Streamlit
 
 ---
