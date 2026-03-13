@@ -255,7 +255,10 @@ Tested on Apple (AAPL) 10-K filing (2025-10-31):
 
 ## What's Next
 
-The retry loop never triggered in testing. I traced this: a representative Tesla query returned `CITED_COUNT: 14, UNCITED_COUNT: 2` (87.5% cited), well above the 30% uncited threshold. The `temperature=0.1` + context-only prompt + llama-3.3-70b combination is suppressing hallucination at the Analyzer stage — the Critic is working correctly, it just rarely has cause to retry.
+Update: After publishing, a live Apple 10-K query returned retry_count: 1 in the Langfuse trace — the Critic flagged the first-pass analysis as insufficient and sent it back to the retriever. The second pass returned sufficient. This confirms the retry loop is working in production. The likely cause: the Apple risk factors query retrieved chunks heavy on financial risk disclosures, leaving growth and competitor analyses with low citation coverage on the first pass. The Tesla query (87.5% cited, well above the 30% threshold) didn't trigger a retry because the retrieved chunks covered all three analysis dimensions more evenly.
+
+
+The remaining question — whether the Critic catches a genuinely hallucinated claim — still stands as a future eval task.
 
 The remaining question is whether the Critic would catch a genuinely hallucinated claim if one slipped through. That's still worth testing with a synthetic eval set: inject a known-false claim into the analysis, verify the Critic returns `insufficient`. The eval plan stands — it's now measuring Critic sensitivity rather than basic functionality.
 
