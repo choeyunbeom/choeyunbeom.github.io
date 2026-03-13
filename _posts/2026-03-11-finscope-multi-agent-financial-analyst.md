@@ -246,8 +246,8 @@ Tested on Apple (AAPL) 10-K filing (2025-10-31):
 |---|---|
 | Filing ingested | 575 chunks from HTML 10-K |
 | Retrieval (hybrid) | 8 chunks retrieved per query |
-| Critic verdict (typical) | `sufficient` on first pass |
-| Critic retry triggered | Not observed in testing — all queries passed on first pass |
+| Critic verdict (typical) | `sufficient` on second pass |
+| Critic retry triggered | Confirmed in production — retry_count: 1 on Apple risk query |
 | End-to-end latency | ~15s (Groq llama-3.3-70b, 3 parallel analyses) |
 | Unit tests | 24/24 passing |
 
@@ -255,11 +255,22 @@ Tested on Apple (AAPL) 10-K filing (2025-10-31):
 
 ## What's Next
 
-**Update**: After publishing, a live Apple 10-K query returned retry_count: 1 in the Langfuse trace — the Critic flagged the first-pass analysis as insufficient and sent it back to the retriever. The second pass returned sufficient. This confirms the retry loop is working in production. The likely cause: the Apple risk factors query retrieved chunks heavy on financial risk disclosures, leaving growth and competitor analyses with low citation coverage on the first pass. The Tesla query (87.5% cited, well above the 30% threshold) didn't trigger a retry because the retrieved chunks covered all three analysis dimensions more evenly.
+**Update (March 11):** After publishing, a live Apple 10-K query returned `retry_count: 1` in the Langfuse trace — the Critic flagged the first-pass analysis as insufficient and sent it back to the retriever. The second pass returned `critique: "sufficient"` with feedback: "the majority of claims being directly cited." This confirms the retry loop is working in production. The likely cause: retrieved chunks were heavy on financial risk disclosures, leaving growth and competitor analyses with lower citation coverage on the first pass. The Tesla query (87.5% cited) didn't trigger a retry because the retrieved chunks covered all three analysis dimensions more evenly.
 
+**Update (March 13):** Two follow-up fixes shipped. First, Langfuse v3 broke the tracing layer — `lf.trace()` was removed in favour of the `@observe` decorator pattern. Migrated `monitoring/langfuse_config.py` and `src/api/main.py` accordingly. Second, the original trace had no visibility into individual LangGraph node execution — the entire pipeline appeared as a single span. Added `@observe` to each node function (`retriever_node`, `analyzer_node`, `critic_node`) and each parallel sub-task (`analyze_risk`, `analyze_growth`, `analyze_competitors`). The Langfuse trace now shows the full tree:
 
-The remaining question — whether the Critic catches a genuinely hallucinated claim — still stands as a future eval task.
+```
+financial-analysis
+└── retriever-node
+└── analyzer-node
+    ├── analyze-risk
+    ├── analyze-growth
+    └── analyze-competitors
+└── critic-node
+```
 
-The remaining question is whether the Critic would catch a genuinely hallucinated claim if one slipped through. That's still worth testing with a synthetic eval set: inject a known-false claim into the analysis, verify the Critic returns `insufficient`. The eval plan stands — it's now measuring Critic sensitivity rather than basic functionality.
+Also added `critique_feedback` to `AgentState` — the Critic's FEEDBACK string is now persisted in state, so the first-pass rejection reason is visible in the trace output rather than being discarded.
+
+The remaining question is whether the Critic catches a genuinely hallucinated claim if one slipped through. That's still worth testing with a synthetic eval set: inject a known-false claim into the analysis, verify the Critic returns `insufficient`. The eval plan stands — it's now measuring Critic sensitivity rather than basic functionality.
 
 Code: [github.com/choeyunbeom/finscope](https://github.com/choeyunbeom/finscope)
