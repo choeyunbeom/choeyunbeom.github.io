@@ -12,6 +12,21 @@ MSc Data Science & AI student at the University of Liverpool. I build end-to-end
 
 ## Projects
 
+### DefectVision - Manufacturing Defect Detector
+
+Real-time manufacturing defect detection using unsupervised anomaly detection — trained on normal images only, no labeled defects required.
+
+- **Stack**: Anomalib, PatchCore, PyTorch, OpenVINO, FastAPI, Streamlit, OpenCV, Docker
+- 100% Image AUROC on MVTec AD bottle; 8–20pp drop on the harder MVTec AD 2 benchmark
+- Lighting augmentation experiment: discovered augmentation hurts memory-bank methods by widening the normal distribution in feature space
+- FastAPI inference API with `/calibrate` endpoint for on-site threshold tuning
+- Real-time webcam streaming with queue-based non-blocking inference pipeline
+- 14 tests, CI/CD with GitHub Actions, Docker deployment
+
+[Read the post](/machine%20learning/computer%20vision/defectvision-anomaly-detection/)
+
+---
+
 ### FinScope - Multi-Agent Financial Report Analyst
 
 Multi-agent RAG system that analyses SEC EDGAR and Companies House filings through a 3-agent pipeline.
@@ -58,7 +73,7 @@ Autonomous racing agent trained on the TORCS Corkscrew track using deep reinforc
 ## Skills
 
 **Languages**: Python, SQL  
-**ML/AI**: PyTorch, Hugging Face, LangChain, LangGraph, RAG, Multi-Agent Systems, RL (SAC, PPO), LoRA fine-tuning
+**ML/AI**: PyTorch, Hugging Face, LangChain, LangGraph, RAG, Multi-Agent Systems, RL (SAC, PPO), LoRA fine-tuning, Anomaly Detection (PatchCore), OpenVINO
 **MLOps**: FastAPI, Docker, ChromaDB, pytest, GitHub Actions
 **Tools**: Git, Ollama, Streamlit
 

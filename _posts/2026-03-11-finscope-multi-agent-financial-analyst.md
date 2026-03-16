@@ -38,19 +38,18 @@ This pushed me toward a multi-agent architecture instead of a single-agent Q&A l
 
 ## Architecture
 
-```
-User Query (e.g. "AAPL" or "Apple")
-    ↓
-[Input Resolver] — ticker/name → CIK → latest 10-K
-    ↓
-[Retriever Agent] — ChromaDB dense + BM25 hybrid + RRF + cross-encoder rerank
-    ↓
-[Analyzer Agent] — Risk / Growth / Competitor (runs in parallel)
-    ↓
-[Critic Agent] — citation check → retry if >30% uncited (max 2x)
-    ↓
-Final Report with source citations
-```
+<pre class="mermaid">
+graph TD
+    A["User Query\n(e.g. 'AAPL' or 'Apple')"] --> B["Input Resolver\nticker/name → CIK → latest 10-K"]
+    B --> C["Retriever Agent\nChromaDB dense + BM25 hybrid + RRF + cross-encoder rerank"]
+    C --> D["Analyzer Agent"]
+    D --> D1["Risk"]
+    D --> D2["Growth"]
+    D --> D3["Competitor"]
+    D1 & D2 & D3 --> E["Critic Agent\ncitation check → retry if >30% uncited (max 2x)"]
+    E -->|"pass"| F["Final Report with source citations"]
+    E -->|"fail (retry)"| C
+</pre>
 
 The key design decision: **why 3 agents instead of 1?**
 

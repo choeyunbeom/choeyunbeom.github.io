@@ -72,32 +72,17 @@ Three layers of challenge in this project:
 
 ### 2.1 Final Architecture
 
-```
-User Query
-    │
-    ▼
-FastAPI Backend (POST /query)
-    │
-    ├─► ChromaDB Vector Search (Top-40)  ─┐
-    │   mxbai-embed-large                 │
-    │                                     ▼
-    └─► BM25 Keyword Search (Top-40)  ──► RRF Fusion (k=60)
-                                          │
-                                          ▼
-                                  Cross-Encoder Reranker
-                                  ms-marco-MiniLM-L-6-v2
-                                          │
-                                          ▼
-                              Section-Aware Deduplication
-                               (arxiv_id::section key)
-                                          │
-                                          ▼
-                              Qwen3 4B (via Ollama)
-                              System prompt + Context
-                                          │
-                                          ▼
-                              Cited Answer → Streamlit UI
-```
+<pre class="mermaid">
+graph TD
+    A["User Query"] --> B["FastAPI Backend\n(POST /query)"]
+    B --> C["ChromaDB Vector Search (Top-40)\nmxbai-embed-large"]
+    B --> D["BM25 Keyword Search (Top-40)"]
+    C & D --> E["RRF Fusion (k=60)"]
+    E --> F["Cross-Encoder Reranker\nms-marco-MiniLM-L-6-v2"]
+    F --> G["Section-Aware Deduplication\n(arxiv_id::section key)"]
+    G --> H["Qwen3 4B (via Ollama)\nSystem prompt + Context"]
+    H --> I["Cited Answer → Streamlit UI"]
+</pre>
 
 ### 2.2 Final Statistics
 
