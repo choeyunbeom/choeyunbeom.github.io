@@ -6,7 +6,7 @@ author_profile: true
 
 ## Hi, I'm Yunbeom Choe
 
-MSc Data Science & AI student at the University of Liverpool. I build end-to-end ML systems - from reinforcement learning agents to production-ready RAG pipelines - and write honestly about what breaks along the way.
+MSc Data Science & AI student at the University of Liverpool. I build end-to-end ML systems - from reinforcement learning agents to fully deployed RAG pipelines - and write honestly about what breaks along the way.
 
 ---
 

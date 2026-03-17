@@ -614,7 +614,7 @@ Starting from zero, across 7 days:
 - **Improved retrieval from 60% to 100% hit rate** through 6 systematic experiments
 - **Identified training data contamination** as the cause of a 6.8-hour fine-tuning failure
 - **Demonstrated that few-shot prompting outperformed LoRA fine-tuning** for a 4B-parameter model on this task
-- **Shipped a production-ready system** with 104 tests, CI/CD, and Docker Compose deployment
+- **Shipped an end-to-end deployed system** with 104 tests, CI/CD, and Docker Compose deployment
 
 More importantly, the debugging methodology is transferable:
 
