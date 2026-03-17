@@ -1,6 +1,6 @@
 ---
 title: "DefectVision: Building a Real-Time Manufacturing Defect Detector Trained on Normal Images Only"
-date: 2026-03-17
+date: 2026-03-16
 categories:
   - Machine Learning
   - Computer Vision
