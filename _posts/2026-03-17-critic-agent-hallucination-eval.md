@@ -211,6 +211,8 @@ critic-eval-experiment (root, ~297s total)
 │   └── critic-eval-llm-call (LLM call per judge)
 ```
 
+![Langfuse trace showing critic-eval-llm-call output with verdict: insufficient](/assets/images/langfuse.png)
+
 Each observation captures latency per call. The 70B judge calls averaged 17-22s per evaluation, while the 8B calls averaged 9-13s — faster, but the accuracy tradeoff isn't worth it.
 
 One gap: `usageDetails` is empty across all observations. Groq's SDK doesn't automatically report token usage to Langfuse's `@observe` decorator. To get token-level cost tracking, you'd need to either use the OpenAI-compatible wrapper with Langfuse's OpenAI integration, or manually pass usage data from the Groq response object. For this experiment, latency was sufficient as a proxy.
