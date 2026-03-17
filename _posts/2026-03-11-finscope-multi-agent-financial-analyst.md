@@ -270,6 +270,6 @@ financial-analysis
 
 Also added `critique_feedback` to `AgentState` — the Critic's FEEDBACK string is now persisted in state, so the first-pass rejection reason is visible in the trace output rather than being discarded.
 
-The remaining question is whether the Critic catches a genuinely hallucinated claim if one slipped through. That's still worth testing with a synthetic eval set: inject a known-false claim into the analysis, verify the Critic returns `insufficient`. The eval plan stands — it's now measuring Critic sensitivity rather than basic functionality.
+**Update**: The Critic evaluation is now done — built a synthetic eval suite, tested 70B vs 8B as the judge model, and measured hallucination detection accuracy. Full results in the follow-up post: [LLM-as-Judge for Hallucination Detection: Does the Critic Agent Actually Work?](/machine%20learning/nlp/critic-agent-hallucination-eval/)
 
 Code: [github.com/choeyunbeom/finscope](https://github.com/choeyunbeom/finscope)
