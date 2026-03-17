@@ -24,7 +24,20 @@ toc_sticky: true
 
 ---
 
-## Why Extend to Financial Domain?
+## Abstract
+
+This post documents a 3-day build extending an academic RAG system to financial filings. The core engineering challenge was moving from single-agent Q&A to a multi-agent pipeline where three specialised agents (Retriever, Analyzer, Critic) coordinate through LangGraph's StateGraph. The Analyzer runs risk, growth, and competitor analyses in parallel via `asyncio.gather`; the Critic checks citation coverage and triggers retries when >30% of claims are unsupported. Along the way: EDGAR API quirks, a company name resolution bug that returned a hotel REIT instead of Apple Inc., and a code review that exposed the hybrid retriever was never actually connected. The follow-up post evaluates whether the Critic's hallucination detection actually works.
+
+**Key Contributions:**
+- Multi-agent architecture with conditional retry edges in LangGraph
+- Parallel analysis with concurrent Groq API calls (risk, growth, competitor)
+- LLM-as-Judge Critic agent with citation-based hallucination threshold
+- SEC EDGAR + Companies House dual-source ingestion pipeline
+- 24/24 unit tests covering agents, ingestion, and error handling
+
+---
+
+## 1. Why Extend to Financial Domain?
 
 My [arXiv RAG system](https://choeyunbeom.github.io/machine%20learning/nlp/2026/03/04/arxiv-rag-system.html) got retrieval to 100% hit rate, but the use case was narrow — academic Q&A. Financial filings are a more demanding domain:
 
@@ -36,7 +49,7 @@ This pushed me toward a multi-agent architecture instead of a single-agent Q&A l
 
 ---
 
-## Architecture
+## 2. Architecture
 
 <pre class="mermaid">
 graph TD
@@ -59,7 +72,7 @@ The Critic exists because financial analysis is high-stakes. An uncited claim ab
 
 ---
 
-## Day 1 — Retrieval Foundation
+## 3. Retrieval Foundation
 
 ### SEC EDGAR Integration
 
@@ -98,7 +111,7 @@ Q: "What are Apple's main risk factors?"
 
 ---
 
-## Day 2 — Multi-Agent Graph
+## 4. Multi-Agent Graph
 
 ### LangGraph StateGraph
 
@@ -143,7 +156,7 @@ One design tradeoff: `_parse_verdict` defaults to `"sufficient"` on malformed re
 
 ---
 
-## Day 3 — Polish + Ship
+## 5. Production Layer
 
 FastAPI `/analyze` endpoint, Streamlit UI, Langfuse tracing. The UI connects to FastAPI via `httpx` — agents stay server-side, UI stays thin.
 
@@ -165,7 +178,7 @@ The one gotcha: the document download endpoint requires an explicit `Accept: app
 
 ---
 
-## Post-Ship: External Code Review
+## 6. External Code Review
 
 After shipping, I got a code review that caught several real issues:
 
@@ -185,7 +198,7 @@ Performance note: `_load_all_documents()` fetches the entire collection on every
 
 ---
 
-## Post-Ship Bug Fix: "apple" Returned a Hotel REIT
+## 7. Bug Fix: "apple" Returned a Hotel REIT
 
 After the code review fixes, I ran the system end-to-end with `company: apple`. The report came back about cybersecurity threats, REIT qualification risks, and hotel management companies. Apple Inc. does not own 217 hotels.
 
@@ -224,7 +237,7 @@ The retriever was designed to filter ChromaDB by `company` metadata. But if the 
 
 ---
 
-## What's Different from arXiv RAG
+## 8. What's Different from arXiv RAG
 
 | | arXiv RAG | finscope |
 |---|---|---|
@@ -237,7 +250,7 @@ The retriever was designed to filter ChromaDB by `company` metadata. But if the 
 
 ---
 
-## Results
+## 9. Results
 
 Tested on Apple (AAPL) 10-K filing (2025-10-31):
 
@@ -252,7 +265,19 @@ Tested on Apple (AAPL) 10-K filing (2025-10-31):
 
 ---
 
-## What's Next
+## 10. Lessons Learned
+
+1. **Fail-open vs fail-closed is a design decision, not a default.** The Critic defaults to `"sufficient"` on malformed LLM output. For a prototype this avoids unnecessary retries, but production needs structured outputs (JSON mode) to eliminate the ambiguity entirely.
+
+2. **The obvious API is not always the right API.** EDGAR's full-text search ranked Apple Hospitality REIT above Apple Inc. because it optimises for filing recency, not company relevance. Switching to `/browse-edgar` with `output=atom` fixed it — but only after a user-facing bug shipped.
+
+3. **Integration tests catch what unit tests miss.** 24 unit tests passed while the hybrid retriever was never connected to the pipeline. The code review caught it. End-to-end tests against real data would have caught it sooner.
+
+4. **Observability is not optional for multi-agent systems.** The initial Langfuse integration showed the entire pipeline as a single span. Adding `@observe` per node turned debugging from guesswork into reading a trace tree.
+
+---
+
+## 11. What's Next
 
 **Update (March 11):** After publishing, a live Apple 10-K query returned `retry_count: 1` in the Langfuse trace — the Critic flagged the first-pass analysis as insufficient and sent it back to the retriever. The second pass returned `critique: "sufficient"` with feedback: "the majority of claims being directly cited." This confirms the retry loop is working in production. The likely cause: retrieved chunks were heavy on financial risk disclosures, leaving growth and competitor analyses with lower citation coverage on the first pass. The Tesla query (87.5% cited) didn't trigger a retry because the retrieved chunks covered all three analysis dimensions more evenly.
 

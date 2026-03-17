@@ -27,13 +27,26 @@ toc_sticky: true
 
 ---
 
-## Why This Project
+## Abstract
+
+This post documents the build of a real-time manufacturing defect detection system using unsupervised anomaly detection. The core constraint — no labeled defect data — led to PatchCore, a memory-bank method that learns normality from good samples only. The system achieved 100% Image AUROC on MVTec AD 1, then dropped 8–20pp on the harder MVTec AD 2 benchmark under multi-lighting conditions. The counterintuitive finding: lighting augmentation made performance worse, because PatchCore's frozen backbone means augmentation widens the normal distribution in feature space rather than improving robustness. Shipped as a FastAPI inference API with OpenVINO export, threaded webcam streaming, and a `/calibrate` endpoint for on-site threshold tuning.
+
+**Key Contributions:**
+- Systematic model comparison (PatchCore vs PaDiM vs EfficientAD) with quantitative justification
+- Cross-benchmark evaluation exposing the gap between MVTec AD 1 and AD 2
+- Analysis of why augmentation hurts memory-bank methods (frozen backbone + distribution widening)
+- Production inference pipeline with OpenVINO export, threaded capture, and runtime calibration
+- 14/14 tests with CI pipeline (ruff + pytest + Docker build)
+
+---
+
+## 1. Why This Project
 
 My previous projects — [arXiv RAG](https://choeyunbeom.github.io/machine%20learning/nlp/2026/03/04/arxiv-rag-system.html), [FinScope](https://choeyunbeom.github.io/machine%20learning/nlp/2026/03/11/finscope-multi-agent-financial-analyst.html) — were all NLP. The [TORCS racing agent](https://choeyunbeom.github.io/reinforcement%20learning/autonomous%20driving/2026/01/28/torcs-rl-journey.html) used sensor data but not vision. I wanted to build something end-to-end in CV: raw pixels in, real-time decision out.
 
 Manufacturing defect detection was the right scope. It is a real industrial problem where the constraint — you only have normal samples, never enough defect data — forces you to use unsupervised methods rather than defaulting to a supervised classifier. That constraint is what makes the problem interesting and the solution practical.
 
-## Why Unsupervised?
+## 2. Why Unsupervised?
 
 In real factories, defects are rare and unpredictable. A supervised model (YOLO, image classification) needs hundreds of labeled defect images per defect type — and every time a new defect appears, you relabel and retrain.
 
@@ -41,7 +54,7 @@ PatchCore flips this: train on normal samples only. The model learns "what norma
 
 ---
 
-## Architecture
+## 3. Architecture
 
 <pre class="mermaid">
 graph TD
@@ -59,7 +72,7 @@ The system has four layers: training (offline), inference API (FastAPI), video s
 
 ---
 
-## Model Selection: PatchCore vs PaDiM vs EfficientAD
+## 4. Model Selection: PatchCore vs PaDiM vs EfficientAD
 
 All three models were benchmarked on MVTec AD `bottle` under identical conditions.
 
@@ -75,7 +88,7 @@ PaDiM is 4.5x faster to train but ~1% lower on accuracy. For a one-time training
 
 ---
 
-## MVTec AD Results — Then Reality Hit with AD 2
+## 5. MVTec AD Results — Then Reality Hit with AD 2
 
 ### MVTec AD (the standard benchmark)
 
@@ -126,7 +139,7 @@ The correct mitigation is not augmentation but **collecting training images that
 
 ---
 
-## The Inference API
+## 6. The Inference API
 
 ### Core Prediction
 
@@ -165,7 +178,7 @@ The endpoint accepts N normal images, runs prediction on each, and computes `thr
 
 ---
 
-## Real-Time Streaming Pipeline
+## 7. Real-Time Streaming Pipeline
 
 ### Threaded Camera Capture
 
@@ -191,7 +204,7 @@ The original `_inference_worker` used `time.sleep(self._backoff)` for backoff. A
 
 ---
 
-## OpenVINO Export
+## 8. OpenVINO Export
 
 The model exports to OpenVINO IR for Intel edge deployment. No speedup on Apple M4 (0.97x — OpenVINO falls back to generic CPU while PyTorch uses MPS). The expected 2–5x gain would materialise on Intel hardware (NUCs, industrial PCs).
 
@@ -199,7 +212,7 @@ One export issue worth noting: Anomalib's `engine.export()` failed because `torc
 
 ---
 
-## Dependency Hell
+## 9. Dependency Hell
 
 Three conflicts surfaced during setup:
 
@@ -211,7 +224,7 @@ These are the kinds of issues that don't appear in any tutorial. Anomalib 1.2 wa
 
 ---
 
-## Tests
+## 10. Tests
 
 14 tests across inference and stream modules:
 
@@ -226,7 +239,7 @@ Model-dependent tests auto-skip in CI via `@pytest.mark.skipif(not MODEL_AVAILAB
 
 ---
 
-## Results Summary
+## 11. Results Summary
 
 | Metric | Value |
 |--------|-------|
@@ -239,6 +252,24 @@ Model-dependent tests auto-skip in CI via `@pytest.mark.skipif(not MODEL_AVAILAB
 | Training data required | Normal images only |
 
 The 8–20pp drop from AD 1 to AD 2 is the most important number in this project. It quantifies the gap between benchmark performance and something closer to production reality. Lighting augmentation — the obvious mitigation — made things worse because PatchCore's frozen backbone means augmentation widens the normal distribution rather than improving robustness. The correct fix is data coverage, not data augmentation.
+
+---
+
+## 12. Lessons Learned
+
+1. **Benchmark performance is not production performance.** 100% AUROC on MVTec AD 1 dropped to 80% on AD 2. The difference is entirely environmental — multi-lighting, transparent objects, higher intra-class variance. Any claim about model accuracy needs to specify which benchmark, under which conditions.
+
+2. **Augmentation is not universally helpful.** For discriminative models (CNNs, transformers), augmentation improves generalisation. For memory-bank methods like PatchCore, it widens the normal distribution in feature space and compresses the gap between normal and anomalous patches. The intervention that helps most supervised methods actively hurts this class of unsupervised methods.
+
+3. **Calibration belongs at deployment, not at training.** The checkpoint threshold is trained on MVTec AD images. Real-world cameras produce different score distributions. The `/calibrate` endpoint — upload N normal images, compute `mean + k*std` — is the minimum viable solution for bridging that gap without retraining.
+
+4. **Dependency conflicts are the real engineering cost.** PatchCore training took 211 seconds. Resolving numpy 2.x, ollama SDK, and matplotlib API conflicts took longer. Pinning versions is the fix, but finding the right pins requires reading error traces, not documentation.
+
+---
+
+## 13. Conclusion
+
+DefectVision demonstrates that unsupervised anomaly detection is production-viable for manufacturing inspection — with caveats. PatchCore delivers perfect benchmark scores on controlled datasets, but the 8–20pp drop on MVTec AD 2 shows that real-world deployment requires matching training data to deployment conditions, not tuning model hyperparameters. The most important design decisions were not about the model: they were about runtime calibration, non-blocking inference, and graceful degradation when the API is unreachable. These are the things that determine whether a CV system runs for 5 minutes in a demo or 5 months on a factory floor.
 
 ---
 
