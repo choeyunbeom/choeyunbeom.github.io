@@ -1,27 +1,35 @@
-# Minimal Mistakes remote theme starter
+# choeyunbeom.github.io
 
-Click [**Use this template**](https://github.com/mmistakes/mm-github-pages-starter/generate) button above for the quickest method of getting started with the [Minimal Mistakes Jekyll theme](https://github.com/mmistakes/minimal-mistakes).
+Personal technical blog by **Yunbeom Choe** — MSc Data Science & AI @ University of Liverpool.
 
-Contains basic configuration to get you a site with:
+End-to-end ML projects with honest write-ups on what worked, what broke, and why.
 
-- Sample posts.
-- Sample top navigation.
-- Sample author sidebar with social links.
-- Sample footer links.
-- Paginated home page.
-- Archive pages for posts grouped by year, category, and tag.
-- Sample about page.
-- Sample 404 page.
-- Site wide search.
+## Projects
 
-Replace sample content with your own and [configure as necessary](https://mmistakes.github.io/minimal-mistakes/docs/configuration/).
+### DefectVision — Manufacturing Defect Detector
+Unsupervised anomaly detection on MVTec AD. PatchCore + OpenVINO with FastAPI inference API and real-time webcam streaming.
 
----
+- [Read the post](https://choeyunbeom.github.io/machine%20learning/computer%20vision/defectvision-anomaly-detection/)
+- [Code](https://github.com/choeyunbeom/DefectVision)
 
-## Troubleshooting
+### FinScope — Multi-Agent Financial Report Analyst
+Multi-agent RAG system (Retriever → Analyzer → Critic) for SEC/Companies House filings. LLM-as-Judge hallucination detection with Langfuse tracing.
 
-If you have a question about using Jekyll, start a discussion on the [Jekyll Forum](https://talk.jekyllrb.com/) or [StackOverflow](https://stackoverflow.com/questions/tagged/jekyll). Other resources:
+- [Building the System](https://choeyunbeom.github.io/machine%20learning/nlp/finscope-multi-agent-financial-analyst/)
+- [Critic Agent Hallucination Eval](https://choeyunbeom.github.io/machine%20learning/nlp/critic-agent-hallucination-eval/)
+- [Code](https://github.com/choeyunbeom/finscope)
 
-- [Ruby 101](https://jekyllrb.com/docs/ruby-101/)
-- [Setting up a Jekyll site with GitHub Pages](https://jekyllrb.com/docs/github-pages/)
-- [Configuring GitHub Metadata](https://github.com/jekyll/github-metadata/blob/master/docs/configuration.md#configuration) to work properly when developing locally and avoid `No GitHub API authentication could be found. Some fields may be missing or have incorrect data.` warnings.
+### arXiv RAG System
+Hybrid retrieval RAG over 153 arXiv papers. Includes a LoRA fine-tuning experiment that documented a 28pp regression from training data contamination.
+
+- [Part 1: Building the System](https://choeyunbeom.github.io/machine%20learning/nlp/arxiv-rag-system/)
+- [Part 2: Async Refactoring](https://choeyunbeom.github.io/machine%20learning/nlp/arxiv-rag-async-refactoring/)
+- [Part 3: Why Fine-Tuning Failed](https://choeyunbeom.github.io/machine%20learning/nlp/lora-finetuning-experiment/)
+
+## Stack
+
+Python, PyTorch, LangGraph, Hugging Face, ChromaDB, FastAPI, Docker, Langfuse
+
+## Contact
+
+[yunbeom.choe.dev@gmail.com](mailto:yunbeom.choe.dev@gmail.com) · [LinkedIn](https://www.linkedin.com/in/yunbeom-choe-52a348370) · [Blog](https://choeyunbeom.github.io)
