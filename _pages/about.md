@@ -38,7 +38,7 @@ Multi-agent RAG system that analyses SEC EDGAR and Companies House filings throu
 - Critic agent: LLM-as-judge hallucination check with fail-open design and retry guard
 - Extended from arXiv RAG - same retrieval core, new multi-agent orchestration layer
 
-[Read the post](/machine%20learning/nlp/finscope-multi-agent-financial-analyst/) · [Critic Eval](/machine%20learning/nlp/critic-agent-hallucination-eval/)
+[Part 1: Building the System](/machine%20learning/nlp/finscope-multi-agent-financial-analyst/) · [Part 2: Critic Eval](/machine%20learning/nlp/critic-agent-hallucination-eval/)
 
 ---
 

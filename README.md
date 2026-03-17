@@ -25,6 +25,7 @@ Hybrid retrieval RAG over 153 arXiv papers. Includes a LoRA fine-tuning experime
 - [Part 1: Building the System](https://choeyunbeom.github.io/machine%20learning/nlp/arxiv-rag-system/)
 - [Part 2: Async Refactoring](https://choeyunbeom.github.io/machine%20learning/nlp/arxiv-rag-async-refactoring/)
 - [Part 3: Why Fine-Tuning Failed](https://choeyunbeom.github.io/machine%20learning/nlp/lora-finetuning-experiment/)
+- [Code](https://github.com/choeyunbeom/arxiv_rag_system)
 
 ## Stack
 
