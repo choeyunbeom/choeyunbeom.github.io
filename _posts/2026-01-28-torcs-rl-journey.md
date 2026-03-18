@@ -534,15 +534,15 @@ def calculate_reward_v1(obs):
 ```python
 def calculate_reward_v2(obs):
     reward = obs.distance_traveled * 0.1
-    
+
     # Scaled crash penalty
     if crashed:
         reward -= (200 + obs.distance_traveled / 10)
-    
+
     # Milestone bonuses
     if obs.distance_traveled > 2000:
         reward += 100
-    
+
     return reward
 
 # Problem: Encouraged "parking" behavior
@@ -551,41 +551,46 @@ def calculate_reward_v2(obs):
 
 #### Version 3: Momentum Enforcement (Current)
 
+<details>
+<summary>Full reward function (click to expand)</summary>
+
 ```python
 def calculate_reward_v3(obs):
     reward = 0
-    
+
     # Distance reward (base)
     reward += obs.distance_traveled * 0.1
-    
+
     # Speed reward (conditional)
     if obs.speed > 30:  # Only reward active driving
         reward += (obs.speed / 300) ** 1.2 * 1.5
-    
+
     # Center lane bonus (racing line optimization)
     if obs.speed > 30:
         reward += (1.0 - abs(obs.track_position)) * 0.5
-    
+
     # Survival bonus (encourages longer episodes)
     reward += 0.05
-    
+
     # Penalties
     if crashed:
         reward -= (200 + obs.distance_traveled / 10)
-    
+
     if obs.speed < 20:  # Immediate termination
         reward -= 10
         done = True
-    
+
     # Milestone bonuses
     milestones = {1000: 50, 2000: 100, 3000: 200}
     if obs.distance_traveled in milestones:
         reward += milestones[obs.distance_traveled]
-    
+
     return reward, done
 
 # Result: 37 completions, 0.85% success rate
 ```
+
+</details>
 
 ### 5.2 Hyperparameter Tuning Journey
 
@@ -623,6 +628,9 @@ def calculate_reward_v3(obs):
 
 We implemented comprehensive logging to enable data-driven debugging:
 
+<details>
+<summary>TrainingLogger implementation (click to expand)</summary>
+
 ```python
 class TrainingLogger:
     def log_episode(self, episode_data):
@@ -639,16 +647,18 @@ class TrainingLogger:
             'timestamp': time.time()
         }
         self.log_to_csv(log_entry)
-    
+
     def analyze_failure_modes(self):
         # Automated analysis every 100 episodes
         recent = self.get_recent_episodes(100)
-        
+
         print(f"Stuck rate: {recent['stuck'].mean():.1%}")
         print(f"Crash rate: {recent['crash'].mean():.1%}")
         print(f"Avg distance: {recent['distance'].mean():.0f}m")
         print(f"Low-speed %: {recent['low_speed_steps'].mean():.1%}")
 ```
+
+</details>
 
 This logging enabled us to:
 - Identify the 12.6% low-speed problem
@@ -657,6 +667,9 @@ This logging enabled us to:
 - Correlate hyperparameters with performance
 
 #### Statistical Analysis
+
+<details>
+<summary>Statistical analysis code (click to expand)</summary>
 
 ```python
 # Example analysis that led to Problem #2 discovery
@@ -680,6 +693,8 @@ print(outliers['termination'].value_counts())
 # Crash: 38%
 # → Led to immediate termination solution
 ```
+
+</details>
 
 ---
 
@@ -903,6 +918,9 @@ The journey from "crashing at 2400m" to "completing 3600m" taught us that **RL d
 
 ### A. Repository Structure
 
+<details>
+<summary>Repository structure (click to expand)</summary>
+
 ```
 torcs-rl-project/
 ├── README.md                    # This file
@@ -931,6 +949,8 @@ torcs-rl-project/
     ├── sac_distance_distribution.png
     └── sac_success_rate.png
 ```
+
+</details>
 
 ### B. Hyperparameters
 

@@ -6,7 +6,7 @@ author_profile: true
 
 ## Hi, I'm Yunbeom Choe
 
-MSc Data Science & AI student at the University of Liverpool. I build end-to-end ML systems - from reinforcement learning agents to fully deployed RAG pipelines - and write honestly about what breaks along the way.
+MSc Data Science & AI student at the University of Liverpool, with a background in naval architecture and ocean engineering (Inha University). The shift from modelling physical systems to building ML pipelines was less of a leap than it sounds — both come down to systematic experimentation and honest failure analysis. I wrote more about the transition [here](/data%20science/naval-architecture-to-ai/).
 
 ---
 

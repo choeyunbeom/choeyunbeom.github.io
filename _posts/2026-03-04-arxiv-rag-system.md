@@ -261,8 +261,10 @@ MRR decreased slightly - larger chunks from tangentially related papers now rank
 
 ChromaDB doesn't support BM25 natively. Solution: a parallel pipeline using `rank_bm25` with Reciprocal Rank Fusion (RRF, k=60) to merge vector and BM25 rankings.
 
+<details>
+<summary>RRF fusion implementation (click to expand)</summary>
+
 ```python
-# RRF fusion
 def _rrf_fusion(self, vector_ranks: dict, bm25_ranks: dict, k: int = 60) -> list[str]:
         """Reciprocal Rank Fusion to combine two ranked lists."""
         all_ids = set(vector_ranks.keys()) | set(bm25_ranks.keys())
@@ -278,6 +280,8 @@ def _rrf_fusion(self, vector_ranks: dict, bm25_ranks: dict, k: int = 60) -> list
 
         return sorted(scores.keys(), key=lambda x: scores[x], reverse=True)
 ```
+
+</details>
 
 **Results:**
 

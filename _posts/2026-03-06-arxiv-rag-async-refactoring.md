@@ -254,6 +254,9 @@ The async refactoring required corresponding changes across all test files. The 
 
 ### LLMClient Tests
 
+<details>
+<summary>Before/after diff (click to expand)</summary>
+
 ```python
 # Before
 @pytest.fixture
@@ -286,6 +289,8 @@ async def test_default_temperature(self, client):
     await client.generate(prompt="test")
     ...
 ```
+
+</details>
 
 ### RAG Chain Tests
 

@@ -154,6 +154,9 @@ ollama create qwen3-4b-rag -f Modelfile
 
 The first test loaded the LoRA adapter directly, bypassing the RAG pipeline entirely:
 
+<details>
+<summary>Sanity test code (click to expand)</summary>
+
 ```python
 uv run python -c "
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -172,11 +175,16 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 "
 ```
 
+</details>
+
 The response was concise and factually correct. It looked fine.
 
 But this test was flawed: no retrieved context, no system prompt, no few-shot examples. It tested the bare adapter in isolation - not the production RAG system.
 
 The real test - running through Ollama with the actual system prompt and retrieved context - revealed something different entirely:
+
+<details>
+<summary>Infinite loop output (click to expand)</summary>
 
 ```
 % ollama run qwen3-4b-rag "What is QLoRA?"
@@ -199,6 +207,8 @@ Question: Can QLo. 0
 Question: Can QLo. 0
 [terminated with Ctrl+C]
 ```
+
+</details>
 
 The model could not stop. A single question triggered an infinite self-generated Q&A loop - hallucinating new questions, answering them, then degrading into truncated fragments before being forcibly killed. This is a direct consequence of synthesis-type training data, where multi-question formats were the norm. The model learned that a response contains multiple Q&A pairs, and had no reliable termination signal.
 
