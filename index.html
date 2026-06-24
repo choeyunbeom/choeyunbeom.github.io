@@ -4,32 +4,10 @@ author_profile: true
 header:
   overlay_image: "https://capsule-render.vercel.app/api?type=waving&color=gradient&height=300&section=header"
   overlay_filter: 0
-
-feature_row:
-  - title: "arXiv RAG System"
-    excerpt: "End-to-end academic paper Q&A, built from scratch. **Hit Rate 60→100%, MRR 0.51→0.82.** Async FastAPI + ChromaDB + LLM, fully containerised. [GitHub](https://github.com/choeyunbeom/arxiv_rag_system)"
-    url: "/machine%20learning/nlp/arxiv-rag-system/"
-    btn_label: "Read Post"
-    btn_class: "btn--primary"
-  - title: "FinScope - Multi-Agent Financial Analyst"
-    excerpt: "LangGraph multi-agent system for SEC EDGAR filings. **Retriever→Analyzer→Critic, ~15s parallel analysis** with hallucination check + retry loop. [GitHub](https://github.com/choeyunbeom/finscope)"
-    url: "/machine%20learning/nlp/finscope-multi-agent-financial-analyst/"
-    btn_label: "Read Post"
-    btn_class: "btn--primary"
-  - title: "DefectVision - Manufacturing Defect Detector"
-    excerpt: "Anomaly detection trained on normal images only. **PatchCore, 100% AUROC on MVTec bottle.** FastAPI inference API + Streamlit webcam dashboard. [GitHub](https://github.com/choeyunbeom/defectvision)"
-    url: "/machine%20learning/computer%20vision/defectvision-anomaly-detection/"
-    btn_label: "Read Post"
-    btn_class: "btn--primary"
-  - title: "TORCS RL Racing Agent"
-    excerpt: "Deep RL in the TORCS simulator. **SAC, 9.7M steps**, reward shaping, curriculum learning, and a catastrophic-forgetting investigation. [GitHub](https://github.com/choeyunbeom/ibm_ai_race)"
-    url: "/reinforcement%20learning/autonomous%20driving/torcs-rl-journey/"
-    btn_label: "Read Post"
-    btn_class: "btn--primary"
 ---
-
-<p style="font-size:1.1em;"><strong>🏆 Reply AI Challenge 2026 — 137 / 1,971 (Top 7%)</strong> · <a href="/portfolio/">See full portfolio →</a></p>
 
 <h2>Featured Projects</h2>
 
-{% include feature_row %}
+{% include project-cards.html %}
+
+<p><a href="/portfolio/" class="btn btn--inverse">View full portfolio →</a></p>

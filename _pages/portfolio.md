@@ -10,71 +10,46 @@ classes: wide
 orchestration, computer-vision anomaly detection, and reinforcement learning.
 MSc Data Science & AI, University of Liverpool.
 
-**🏆 Reply AI Challenge 2026 — 137 / 1,971 (Top 7%)**
-
+<p>
 <a href="https://github.com/choeyunbeom" class="btn btn--primary">GitHub</a>
 <a href="https://www.linkedin.com/in/yunbeom-choe-52a348370" class="btn btn--info">LinkedIn</a>
 <a href="mailto:yunbeom.choe.dev@gmail.com" class="btn btn--success">Email</a>
 <a href="/assets/cv.pdf" class="btn btn--warning">CV (PDF)</a>
+</p>
 
----
+## Projects
 
-## arXiv RAG System
+Started with **arXiv RAG** to optimise retrieval (Hit Rate 60→100%, MRR 0.51→0.82).
+Hit the limits of a single-LLM approach, so architected **FinScope** — a LangGraph
+multi-agent system with a Critic Agent for hallucination checking. Below, in order
+of progression:
 
-End-to-end Retrieval-Augmented Generation system for querying academic papers,
-built and optimised from scratch.
+{% include project-cards.html %}
 
-- **Hit Rate 60 → 100%, MRR 0.51 → 0.82** through systematic retrieval optimisation
-- FastAPI `lifespan` startup + fully async I/O pipeline (FastAPI + httpx)
-- Traced a **28pp** fine-tuning regression to training-data contamination
-- **Stack**: FastAPI · ChromaDB · LLM (Qwen3 4B / Ollama) · Docker
+## Competition
 
-<a href="https://github.com/choeyunbeom/arxiv_rag_system" class="btn btn--primary">Code</a>
-<a href="/machine%20learning/nlp/arxiv-rag-system/" class="btn btn--inverse">Write-up</a>
-
-> Started with arXiv RAG to optimise retrieval (Hit Rate 60→100%, MRR 0.51→0.82).
-> Hit the limits of a single-LLM approach, so architected FinScope — a LangGraph
-> multi-agent system with a Critic Agent for hallucination checking.
-
----
-
-## FinScope — Multi-Agent Financial Analyst
-
-Multi-agent RAG system that analyses SEC EDGAR and Companies House filings.
-
-- **LangGraph** orchestration: Retriever → Analyzer → Critic pipeline
-- Parallel Risk / Growth / Competitor analysis via `asyncio.gather` (~15s end-to-end)
-- **Critic Agent**: LLM-as-judge hallucination check with a conditional retry loop
-- Langfuse monitoring across the full agent graph
-- **Stack**: LangGraph · Groq (llama-3.3-70b) · ChromaDB · FastAPI · Langfuse · Docker
-
-<a href="https://github.com/choeyunbeom/finscope" class="btn btn--primary">Code</a>
-<a href="/machine%20learning/nlp/finscope-multi-agent-financial-analyst/" class="btn btn--inverse">Write-up</a>
-
----
-
-## DefectVision — Manufacturing Defect Detector
-
-Real-time manufacturing defect detection using unsupervised anomaly detection.
-
-- **PatchCore**, trained on normal images only — no labelled defects required
-- FastAPI inference API + Streamlit dashboard with live webcam streaming
-- 100% Image AUROC on MVTec AD bottle; honest failure analysis on harder benchmarks
-- **Stack**: Anomalib · PatchCore · PyTorch · OpenVINO · FastAPI · Streamlit · Docker
-
-<a href="https://github.com/choeyunbeom/defectvision" class="btn btn--primary">Code</a>
-<a href="/machine%20learning/computer%20vision/defectvision-anomaly-detection/" class="btn btn--inverse">Write-up</a>
-
----
-
-## TORCS RL Racing Agent
-
-Autonomous racing agent trained on the TORCS Corkscrew track with deep RL.
-
-- **SAC, 9.7M training steps** with reward shaping and curriculum learning
-- Investigated catastrophic forgetting and perverse reward incentives
-- Self-implemented SAC (auto-entropy, twin-Q) in the second iteration
-- **Stack**: Python · PyTorch · SAC · PPO
-
-<a href="https://github.com/choeyunbeom/ibm_ai_race" class="btn btn--primary">Code</a>
-<a href="/reinforcement%20learning/autonomous%20driving/torcs-rl-journey/" class="btn btn--inverse">Write-up</a>
+<div class="pcard-grid" style="grid-template-columns: 1fr;">
+  <div class="pcard">
+    <div class="pcard-head pcard-reply">
+      <i class="fas fa-trophy"></i><span>Reply AI Challenge 2026 — Multi-Agent Fraud Detection</span>
+    </div>
+    <div class="pcard-body">
+      <div class="pcard-metrics">
+        <span class="pcard-metric">137 / 1,971 teams (Top 7%)</span>
+        <span class="pcard-metric">6-hour sprint</span>
+        <span class="pcard-metric">5-agent system</span>
+      </div>
+      <div class="pcard-desc">
+        Built a multi-agent fraud-detection system in a 6-hour timed challenge:
+        a LangChain orchestrator routing transactions through Isolation Forest,
+        an LLM investigator, and Critic / Memory agents — with Langfuse tracing
+        and a fixed LLM budget. Placed 137th of 1,971 teams.
+      </div>
+      <div class="pcard-stack">LangChain · Langfuse · IsolationForest · Whisper · OpenRouter</div>
+      <div class="pcard-actions">
+        <a href="https://github.com/choeyunbeom/reply_ai_chal" class="btn btn--primary btn--small">Code</a>
+        <a href="/machine%20learning/competition/reply-mirror-ai-challenge-2026/" class="btn btn--inverse btn--small">Write-up</a>
+      </div>
+    </div>
+  </div>
+</div>
